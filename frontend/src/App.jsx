@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { AuthProvider } from './context/AuthContext';
+import CartProvider from './context/CartContext';
 import PrivateRoute from './components/PrivateRoute';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -18,6 +19,9 @@ import OrderDetail from './pages/OrderDetail';
 import DonateFood from './pages/DonateFood';
 import DonateMoney from './pages/DonateMoney';
 import Dashboard from './pages/Dashboard';
+import CSRCredits from './pages/CSRCredits';
+import DonationManagement from './pages/DonationManagement';
+import CloudKitchen from './pages/CloudKitchen';
 import NotFound from './pages/NotFound';
 
 // Create a custom theme
@@ -87,48 +91,59 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <AuthProvider>
-        <Router>
-          <Header />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/restaurants" element={<Restaurants />} />
-            <Route path="/restaurants/:id" element={<RestaurantDetail />} />
-            <Route path="/donate-food" element={<DonateFood />} />
-            <Route path="/donate-money" element={<DonateMoney />} />
-            
-            {/* Protected Routes */}
-            <Route 
-              path="/profile" 
-              element={<PrivateRoute><Profile /></PrivateRoute>} 
-            />
-            <Route 
-              path="/cart" 
-              element={<PrivateRoute><Cart /></PrivateRoute>} 
-            />
-            <Route 
-              path="/checkout" 
-              element={<PrivateRoute><Checkout /></PrivateRoute>} 
-            />
-            <Route 
-              path="/orders" 
-              element={<PrivateRoute><Orders /></PrivateRoute>} 
-            />
-            <Route 
-              path="/orders/:id" 
-              element={<PrivateRoute><OrderDetail /></PrivateRoute>} 
-            />
-            <Route 
-              path="/dashboard" 
-              element={<PrivateRoute requiresAdmin={true}><Dashboard /></PrivateRoute>} 
-            />
-            
-            {/* 404 Page */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-          <Footer />
-        </Router>
+        <CartProvider>
+          <Router>
+            <Header />
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/restaurants" element={<Restaurants />} />
+              <Route path="/restaurants/:id" element={<RestaurantDetail />} />
+              <Route path="/donate-food" element={<DonateFood />} />
+              <Route path="/donate-money" element={<DonateMoney />} />
+              <Route path="/csr-credits" element={<CSRCredits />} />
+              
+              {/* Protected Routes */}
+              <Route 
+                path="/profile" 
+                element={<PrivateRoute><Profile /></PrivateRoute>} 
+              />
+              <Route 
+                path="/cart" 
+                element={<PrivateRoute><Cart /></PrivateRoute>} 
+              />
+              <Route 
+                path="/checkout" 
+                element={<PrivateRoute><Checkout /></PrivateRoute>} 
+              />
+              <Route 
+                path="/orders" 
+                element={<PrivateRoute><Orders /></PrivateRoute>} 
+              />
+              <Route 
+                path="/orders/:id" 
+                element={<PrivateRoute><OrderDetail /></PrivateRoute>} 
+              />
+              <Route 
+                path="/dashboard" 
+                element={<PrivateRoute requiresAdmin={true}><Dashboard /></PrivateRoute>} 
+              />
+              <Route 
+                path="/donation-management" 
+                element={<PrivateRoute requiresAdmin={true}><DonationManagement /></PrivateRoute>} 
+              />
+              <Route 
+                path="/cloud-kitchen" 
+                element={<PrivateRoute requiresAdmin={true}><CloudKitchen /></PrivateRoute>} 
+              />
+              
+              {/* 404 Page */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+            <Footer />
+          </Router>
+        </CartProvider>
       </AuthProvider>
     </ThemeProvider>
   );

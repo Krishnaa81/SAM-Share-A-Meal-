@@ -22,7 +22,7 @@ import {
 import { 
   Favorite, 
   Restaurant, 
-  Volunteer, 
+  VolunteerActivism, 
   ShoppingCart, 
   Business, 
   ArrowForward,
@@ -31,7 +31,9 @@ import {
   People,
   Star
 } from '@mui/icons-material';
-import HeroImage from '../assets/hero-image.jpg';
+// Replace the local import with a constant URL
+// import HeroImage from '../assets/hero-image.jpg';
+const HeroImage = 'https://source.unsplash.com/random/1600x900/?food,sharing';
 
 // Mock data for featured restaurants
 const FEATURED_RESTAURANTS = [
@@ -121,7 +123,7 @@ const HOW_IT_WORKS_STEPS = [
   {
     title: 'Donate Excess',
     description: 'Restaurants can donate excess food to charity partners',
-    icon: <Volunteer sx={{ fontSize: 40 }} />,
+    icon: <VolunteerActivism sx={{ fontSize: 40 }} />,
   },
   {
     title: 'Earn CSR Credits',
@@ -150,7 +152,7 @@ const Home = () => {
       >
         <Box
           component="img"
-          src="https://source.unsplash.com/random/1920x1080/?food,restaurant"
+          src={HeroImage}
           alt="FoodShare"
           sx={{
             position: 'absolute',
@@ -200,7 +202,7 @@ const Home = () => {
                   size="large"
                   component={RouterLink}
                   to="/donate-food"
-                  startIcon={<Volunteer />}
+                  startIcon={<VolunteerActivism />}
                   sx={{ py: 1.5, px: 3, borderColor: 'white', '&:hover': { borderColor: 'white', bgcolor: 'rgba(255,255,255,0.1)' } }}
                 >
                   Donate Food
@@ -425,8 +427,8 @@ const Home = () => {
                       {partner.description}
                     </Typography>
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                      <Volunteer color="primary" sx={{ mr: 1 }} />
-                      <Typography variant="body2" color="text.secondary">
+                      <VolunteerActivism color="primary" sx={{ mr: 1 }} />
+                      <Typography variant="body2">
                         {partner.donationsReceived.toLocaleString()} meals received
                       </Typography>
                     </Box>

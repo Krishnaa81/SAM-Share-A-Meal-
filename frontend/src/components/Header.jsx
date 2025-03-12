@@ -31,7 +31,9 @@ import {
   PersonAdd,
   Dashboard,
   LocalShipping,
-  Volunteer,
+  VolunteerActivism,
+  Restaurant,
+  Business,
 } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
@@ -74,7 +76,9 @@ const Header = () => {
   const navLinks = [
     { name: 'Home', path: '/' },
     { name: 'Restaurants', path: '/restaurants', icon: <RestaurantMenu /> },
-    { name: 'Donate Food', path: '/donate-food', icon: <Volunteer /> },
+    { name: 'Donate Food', path: '/donate-food', icon: <VolunteerActivism /> },
+    { name: 'Cloud Kitchen', path: '/cloud-kitchen', icon: <Restaurant /> },
+    { name: 'CSR Credits', path: '/csr-credits', icon: <Business /> },
   ];
   
   // Links for authenticated users
@@ -86,6 +90,7 @@ const Header = () => {
   // Admin links
   const adminLinks = user?.role === 'admin' ? [
     { name: 'Dashboard', path: '/dashboard', icon: <Dashboard /> },
+    { name: 'Donation Management', path: '/donation-management', icon: <VolunteerActivism /> },
   ] : [];
 
   // Mobile drawer content
