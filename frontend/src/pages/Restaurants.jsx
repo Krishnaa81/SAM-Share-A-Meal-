@@ -47,10 +47,10 @@ const MOCK_RESTAURANTS = [
   {
     id: 1,
     name: 'Spice Garden',
-    image: 'https://source.unsplash.com/random/600x400/?restaurant,indian',
+    image: '/images/restaurants/spice-garden.jpg',
     cuisine: 'Indian',
     rating: 4.8,
-    priceLevel: '$$',
+    priceLevel: '₹₹',
     deliveryTime: '20-30 min',
     featured: true,
     location: 'Jubilee Hills',
@@ -60,10 +60,10 @@ const MOCK_RESTAURANTS = [
   {
     id: 2,
     name: 'Pasta Paradise',
-    image: 'https://source.unsplash.com/random/600x400/?restaurant,italian',
+    image: '/images/restaurants/pasta-paradise.jpg',
     cuisine: 'Italian',
     rating: 4.5,
-    priceLevel: '$$$',
+    priceLevel: '₹₹₹',
     deliveryTime: '25-35 min',
     featured: false,
     location: 'Banjara Hills',
@@ -72,11 +72,11 @@ const MOCK_RESTAURANTS = [
   },
   {
     id: 3,
-    name: 'Sushi Station',
-    image: 'https://source.unsplash.com/random/600x400/?restaurant,japanese',
+    name: 'Sushi Sake',
+    image: '/images/restaurants/sushi-sake.jpg',
     cuisine: 'Japanese',
     rating: 4.7,
-    priceLevel: '$$$',
+    priceLevel: '₹₹₹',
     deliveryTime: '30-40 min',
     featured: false,
     location: 'Madhapur',
@@ -85,11 +85,11 @@ const MOCK_RESTAURANTS = [
   },
   {
     id: 4,
-    name: 'Burger Bros',
-    image: 'https://source.unsplash.com/random/600x400/?restaurant,burger',
+    name: 'Burger Barn',
+    image: '/images/restaurants/burger-barn.jpg',
     cuisine: 'American',
     rating: 4.4,
-    priceLevel: '$',
+    priceLevel: '₹',
     deliveryTime: '15-25 min',
     featured: true,
     location: 'Gachibowli',
@@ -99,10 +99,10 @@ const MOCK_RESTAURANTS = [
   {
     id: 5,
     name: 'Thai Delight',
-    image: 'https://source.unsplash.com/random/600x400/?restaurant,thai',
+    image: '/images/restaurants/thai-delight.jpg',
     cuisine: 'Thai',
     rating: 4.6,
-    priceLevel: '$$',
+    priceLevel: '₹₹',
     deliveryTime: '25-35 min',
     featured: false,
     location: 'Hitech City',
@@ -111,11 +111,11 @@ const MOCK_RESTAURANTS = [
   },
   {
     id: 6,
-    name: 'Mexican Fiesta',
-    image: 'https://source.unsplash.com/random/600x400/?restaurant,mexican',
+    name: 'Mexico Lindo',
+    image: '/images/restaurants/mexico-lindo.jpg',
     cuisine: 'Mexican',
     rating: 4.3,
-    priceLevel: '$$',
+    priceLevel: '₹₹',
     deliveryTime: '30-45 min',
     featured: false,
     location: 'Kukatpally',
@@ -124,11 +124,11 @@ const MOCK_RESTAURANTS = [
   },
   {
     id: 7,
-    name: 'Pizza Palace',
-    image: 'https://source.unsplash.com/random/600x400/?restaurant,pizza',
+    name: 'Pizza Place',
+    image: '/images/restaurants/pizza-place.jpg',
     cuisine: 'Italian',
     rating: 4.1,
-    priceLevel: '$',
+    priceLevel: '₹',
     deliveryTime: '20-30 min',
     featured: true,
     location: 'Ameerpet',
@@ -137,11 +137,11 @@ const MOCK_RESTAURANTS = [
   },
   {
     id: 8,
-    name: 'Chinese Wok',
-    image: 'https://source.unsplash.com/random/600x400/?restaurant,chinese',
+    name: 'Golden Dragon',
+    image: '/images/restaurants/golden-dragon.jpg',
     cuisine: 'Chinese',
     rating: 4.4,
-    priceLevel: '$$',
+    priceLevel: '₹₹',
     deliveryTime: '25-40 min',
     featured: false,
     location: 'Secunderabad',
@@ -268,7 +268,7 @@ const Restaurants = () => {
   const [filters, setFilters] = useState({
     cuisine: '',
     location: '',
-    priceRange: [0, 3], // $ to $$$
+    priceRange: [0, 3], // ₹ to ₹₹₹
     rating: 0,
     showFeaturedOnly: false,
     maxDeliveryTime: 60,
@@ -322,7 +322,7 @@ const Restaurants = () => {
           return false;
         }
         
-        // Price range filter ($ to $$$)
+        // Price range filter (₹ to ₹₹₹)
         const priceLevel = restaurant.priceLevel.length;
         if (priceLevel < filters.priceRange[0] + 1 || priceLevel > filters.priceRange[1] + 1) {
           return false;
@@ -476,23 +476,29 @@ const Restaurants = () => {
                 </Grid>
 
                 <Grid item xs={12} sm={6} md={3}>
-                  <Typography gutterBottom>Price Range</Typography>
-                  <Slider
-                    value={filters.priceRange}
-                    onChange={(event, newValue) => {
-                      setFilters({...filters, priceRange: newValue});
-                    }}
-                    valueLabelDisplay="auto"
-                    step={1}
-                    marks={[
-                      { value: 0, label: '$' },
-                      { value: 1, label: '$$' },
-                      { value: 2, label: '$$$' },
-                      { value: 3, label: '$$$$' },
-                    ]}
-                    min={0}
-                    max={3}
-                  />
+                  <Box sx={{ width: '100%', pl: 2, pr: 2 }}>
+                    <Typography gutterBottom>Price Range</Typography>
+                    <Slider
+                      value={filters.priceRange}
+                      onChange={(event, newValue) => {
+                        setFilters({...filters, priceRange: newValue});
+                      }}
+                      valueLabelFormat={(value) => {
+                        const labels = [
+                          { value: 0, label: '₹' },
+                          { value: 1, label: '₹₹' },
+                          { value: 2, label: '₹₹₹' },
+                          { value: 3, label: '₹₹₹₹' },
+                        ];
+                        return labels.find((label) => label.value === value)?.label;
+                      }}
+                      step={1}
+                      min={0}
+                      max={3}
+                      marks
+                      valueLabelDisplay="auto"
+                    />
+                  </Box>
                   
                   <Box sx={{ mt: 3 }}>
                     <Typography gutterBottom>Minimum Rating</Typography>

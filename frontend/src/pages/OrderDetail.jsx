@@ -34,6 +34,7 @@ import {
 } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
+import * as imageUtils from '../utils/imageUtils';
 
 // Helper function to format date
 const formatDate = (dateString) => {
@@ -91,7 +92,11 @@ const OrderDetail = () => {
         return;
       }
 
+      setLoading(true);
+      setError('');
+
       try {
+        // Try to fetch from API first
         const config = {
           headers: {
             Authorization: `Bearer ${user.token}`
@@ -99,16 +104,52 @@ const OrderDetail = () => {
         };
 
         const response = await axios.get(`/api/orders/${id}`, config);
-        setOrder(response.data);
+        const orderData = response.data;
+        
+        // Save to localStorage for offline access
+        const savedOrders = JSON.parse(localStorage.getItem(`user_${user.id}_orders`) || '[]');
+        const orderIndex = savedOrders.findIndex(order => order._id === id);
+        
+        if (orderIndex !== -1) {
+          savedOrders[orderIndex] = orderData;
+        } else {
+          savedOrders.push(orderData);
+        }
+        
+        localStorage.setItem(`user_${user.id}_orders`, JSON.stringify(savedOrders));
+        
+        setOrder(orderData);
         setLoading(false);
       } catch (error) {
-        setError('Failed to fetch order details. Please try again later.');
+        console.error('API fetch error:', error);
+        
+        // Try to get from localStorage as fallback
+        try {
+          const savedOrders = JSON.parse(localStorage.getItem(`user_${user.id}_orders`) || '[]');
+          const savedOrder = savedOrders.find(order => order._id === id);
+          
+          if (savedOrder) {
+            setOrder(savedOrder);
+            setLoading(false);
+            return;
+          }
+        } catch (localStorageError) {
+          console.error('LocalStorage error:', localStorageError);
+        }
+        
+        // If no saved order, use mock data
+        setError('Could not connect to server. Showing sample order data.');
         setLoading(false);
       }
     };
 
     fetchOrderDetails();
   }, [id, user]);
+
+  // Replace the handleImageError function with our utility version
+  const handleImageError = (e) => {
+    imageUtils.handleImageError(e, 'restaurant');
+  };
 
   if (!user) {
     return (
@@ -181,7 +222,7 @@ const OrderDetail = () => {
     status: ['pending', 'processing', 'delivering', 'completed'][Math.floor(Math.random() * 4)],
     restaurant: {
       name: 'Sample Restaurant',
-      image: 'https://source.unsplash.com/random/600x400/?restaurant',
+      image: '/images/restaurants/spice-junction.jpg',
       address: '123 Main St, New York, NY'
     },
     items: [
@@ -228,11 +269,24 @@ const OrderDetail = () => {
               <Typography variant="h4">
                 Order #{displayOrder.orderNumber || displayOrder._id.substring(displayOrder._id.length - 8)}
               </Typography>
-              <Chip
-                icon={getStatusIcon(displayOrder.status)}
-                label={displayOrder.status}
-                color={getStatusColor(displayOrder.status)}
-              />
+              <Box>
+                <Chip
+                  icon={getStatusIcon(displayOrder.status)}
+                  label={displayOrder.status}
+                  color={getStatusColor(displayOrder.status)}
+                  sx={{ mr: 1 }}
+                />
+                <Button
+                  component={Link}
+                  to={`/order-tracking/${displayOrder._id}`}
+                  variant="contained"
+                  color="secondary"
+                  startIcon={<LocalShipping />}
+                  size="small"
+                >
+                  Track Order
+                </Button>
+              </Box>
             </Box>
             
             <Typography variant="body1" color="text.secondary" gutterBottom>
@@ -248,9 +302,12 @@ const OrderDetail = () => {
                   <Card sx={{ display: 'flex', mb: 2 }}>
                     <Box sx={{ width: 100, height: 100 }}>
                       <img 
-                        src={displayOrder.restaurant.image} 
-                        alt={displayOrder.restaurant.name}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        {...imageUtils.createImageProps(
+                          displayOrder.restaurant.image,
+                          displayOrder.restaurant.name,
+                          'restaurant',
+                          { style: { width: '100%', height: '100%', objectFit: 'cover' } }
+                        )}
                       />
                     </Box>
                     <CardContent>
@@ -313,8 +370,8 @@ const OrderDetail = () => {
                     <TableRow key={index}>
                       <TableCell>{item.name}</TableCell>
                       <TableCell align="center">{item.quantity}</TableCell>
-                      <TableCell align="right">${item.price.toFixed(2)}</TableCell>
-                      <TableCell align="right">${(item.quantity * item.price).toFixed(2)}</TableCell>
+                      <TableCell align="right">₹{item.price.toFixed(2)}</TableCell>
+                      <TableCell align="right">₹{(item.quantity * item.price).toFixed(2)}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -325,22 +382,22 @@ const OrderDetail = () => {
               <Grid container spacing={1}>
                 <Grid item xs={12} container justifyContent="space-between">
                   <Typography variant="body1">Subtotal</Typography>
-                  <Typography variant="body1">${displayOrder.subtotal.toFixed(2)}</Typography>
+                  <Typography variant="body1">₹{displayOrder.subtotal.toFixed(2)}</Typography>
                 </Grid>
                 <Grid item xs={12} container justifyContent="space-between">
                   <Typography variant="body1">Delivery Fee</Typography>
-                  <Typography variant="body1">${displayOrder.deliveryFee.toFixed(2)}</Typography>
+                  <Typography variant="body1">₹{displayOrder.deliveryFee.toFixed(2)}</Typography>
                 </Grid>
                 <Grid item xs={12} container justifyContent="space-between">
                   <Typography variant="body1">Tax</Typography>
-                  <Typography variant="body1">${displayOrder.tax.toFixed(2)}</Typography>
+                  <Typography variant="body1">₹{displayOrder.tax.toFixed(2)}</Typography>
                 </Grid>
                 <Grid item xs={12}>
                   <Divider sx={{ my: 1 }} />
                 </Grid>
                 <Grid item xs={12} container justifyContent="space-between">
                   <Typography variant="h6">Total</Typography>
-                  <Typography variant="h6">${displayOrder.totalAmount.toFixed(2)}</Typography>
+                  <Typography variant="h6">₹{displayOrder.totalAmount.toFixed(2)}</Typography>
                 </Grid>
                 <Grid item xs={12} container justifyContent="space-between">
                   <Typography variant="body2" color="text.secondary">Payment Method</Typography>

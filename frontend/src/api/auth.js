@@ -2,32 +2,72 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:5000/api/auth';
 
+// Create axios instance with default config
+const api = axios.create({
+  baseURL: API_URL,
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  withCredentials: true // This is important for cookies to be sent
+});
+
+// Store token in localStorage
+const setToken = (token) => {
+  if (token) {
+    localStorage.setItem('token', token);
+  } else {
+    localStorage.removeItem('token');
+  }
+};
+
+// Get token from localStorage
+const getToken = () => {
+  return localStorage.getItem('token');
+};
+
+// Add token to request headers if available
+api.interceptors.request.use(
+  (config) => {
+    const token = getToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// Handle token expiration and auth errors
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Clear token on 401 errors
+      setToken(null);
+      
+      // Don't redirect if we're already on the login page to prevent infinite loops
+      if (!window.location.pathname.includes('/login')) {
+        window.location.href = '/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 // Register user
 export const register = async (userData) => {
   try {
-    console.log('Sending registration data to API:', userData);
-    
-    const response = await axios.post(`${API_URL}/register`, userData);
-    
-    console.log('Registration API response:', response.data);
-    
-    if (response.data) {
-      localStorage.setItem('user', JSON.stringify(response.data));
+    const response = await api.post('/register', userData);
+    if (response.data.token) {
+      setToken(response.data.token);
     }
-    return response.data;
+    return response.data.user || response.data;
   } catch (error) {
-    console.error('Registration error details:', error.response?.data || error.message);
-    
-    // Enhanced error handling
     if (error.response) {
-      // The request was made and the server responded with a status code
-      // that falls out of the range of 2xx
-      throw error.response.data?.message || 'Server responded with an error';
+      throw error.response.data?.message || 'Registration failed';
     } else if (error.request) {
-      // The request was made but no response was received
-      throw 'No response from server. Please check your internet connection.';
+      throw 'No response from server. Please try again later.';
     } else {
-      // Something happened in setting up the request
       throw error.message || 'An error occurred during registration';
     }
   }
@@ -36,11 +76,11 @@ export const register = async (userData) => {
 // Login user
 export const login = async (email, password) => {
   try {
-    const response = await axios.post(`${API_URL}/login`, { email, password });
-    if (response.data) {
-      localStorage.setItem('user', JSON.stringify(response.data));
+    const response = await api.post('/login', { email, password });
+    if (response.data.token) {
+      setToken(response.data.token);
     }
-    return response.data;
+    return response.data.user || response.data;
   } catch (error) {
     if (error.response) {
       throw error.response.data?.message || 'Invalid credentials';
@@ -53,41 +93,34 @@ export const login = async (email, password) => {
 };
 
 // Logout user
-export const logout = () => {
-  localStorage.removeItem('user');
+export const logout = async () => {
+  try {
+    await api.post('/logout');
+    setToken(null);
+  } catch (error) {
+    console.error('Logout error:', error);
+    // Still clear token even if server logout fails
+    setToken(null);
+    throw error;
+  }
 };
 
 // Get user profile
-export const getProfile = async (token) => {
+export const getProfile = async () => {
   try {
-    const config = {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    };
-    const response = await axios.get(`${API_URL}/profile`, config);
+    const response = await api.get('/profile');
     return response.data;
   } catch (error) {
-    if (error.response) {
-      throw error.response.data?.message || 'Failed to fetch profile';
-    } else {
-      throw error.message || 'An error occurred while fetching profile';
-    }
+    console.error('Get profile error:', error);
+    // Don't throw the error, just return null to prevent reload loops
+    return null;
   }
 };
 
 // Update user profile
-export const updateProfile = async (userData, token) => {
+export const updateProfile = async (userData) => {
   try {
-    const config = {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    };
-    const response = await axios.put(`${API_URL}/profile`, userData, config);
-    if (response.data) {
-      localStorage.setItem('user', JSON.stringify(response.data));
-    }
+    const response = await api.put('/profile', userData);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -100,5 +133,15 @@ export const updateProfile = async (userData, token) => {
 
 // Get current user from localStorage
 export const getCurrentUser = () => {
-  return JSON.parse(localStorage.getItem('user'));
+  const user = localStorage.getItem('user');
+  if (user) {
+    try {
+      return JSON.parse(user);
+    } catch (error) {
+      console.error('Error parsing user data:', error);
+      localStorage.removeItem('user');
+      return null;
+    }
+  }
+  return null;
 }; 

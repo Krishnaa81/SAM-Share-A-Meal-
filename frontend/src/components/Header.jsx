@@ -19,6 +19,7 @@ import {
   ListItemText,
   Badge,
   Divider,
+  ListItemIcon,
 } from '@mui/material';
 import {
   Menu as MenuIcon,
@@ -72,26 +73,55 @@ const Header = () => {
     navigate('/');
   };
 
-  // Common navigation links
+  // Common navigation links for all users
   const navLinks = [
     { name: 'Home', path: '/' },
-    { name: 'Restaurants', path: '/restaurants', icon: <RestaurantMenu /> },
-    { name: 'Donate Food', path: '/donate-food', icon: <VolunteerActivism /> },
-    { name: 'Cloud Kitchen', path: '/cloud-kitchen', icon: <Restaurant /> },
-    { name: 'CSR Credits', path: '/csr-credits', icon: <Business /> },
   ];
   
-  // Links for authenticated users
-  const authLinks = [
-    { name: 'My Orders', path: '/orders', icon: <LocalShipping /> },
-    { name: 'Cart', path: '/cart', icon: <ShoppingCart /> },
-  ];
+  // Links for authenticated users based on role
+  const getAuthLinks = () => {
+    if (!isAuthenticated) return [];
 
-  // Admin links
-  const adminLinks = user?.role === 'admin' ? [
-    { name: 'Dashboard', path: '/dashboard', icon: <Dashboard /> },
-    { name: 'Donation Management', path: '/donation-management', icon: <VolunteerActivism /> },
-  ] : [];
+    // Base links for all authenticated users
+    const baseLinks = [
+      { name: 'Profile', path: '/profile', icon: <Person /> },
+    ];
+
+    switch (user?.role) {
+      case 'restaurant':
+        return [
+          ...baseLinks,
+          { name: 'Restaurant Dashboard', path: '/dashboard', icon: <Restaurant /> },
+          { name: 'Menu Management', path: '/menu-management', icon: <RestaurantMenu /> },
+          { name: 'Orders', path: '/orders', icon: <LocalShipping /> },
+        ];
+      case 'corporate':
+        return [
+          ...baseLinks,
+          { name: 'CSR Dashboard', path: '/csr-dashboard', icon: <Business /> },
+          { name: 'Donate Food', path: '/donate-food', icon: <VolunteerActivism /> },
+          { name: 'Tax Benefits', path: '/tax-benefits', icon: <Business /> },
+        ];
+      case 'cloudKitchen':
+        return [
+          ...baseLinks,
+          { name: 'Kitchen Dashboard', path: '/cloud-kitchen', icon: <Restaurant /> },
+          { name: 'Menu Management', path: '/kitchen-menu', icon: <RestaurantMenu /> },
+          { name: 'Orders', path: '/kitchen-orders', icon: <LocalShipping /> },
+        ];
+      default: // customer
+        return [
+          ...baseLinks,
+          { name: 'Restaurants', path: '/restaurants', icon: <RestaurantMenu /> },
+          { name: 'Cloud Kitchens', path: '/cloud-kitchens', icon: <Restaurant /> },
+          { name: 'My Orders', path: '/orders', icon: <LocalShipping /> },
+          { name: 'Cart', path: '/cart', icon: <ShoppingCart /> },
+          { name: 'Donate Food', path: '/donate-food', icon: <VolunteerActivism /> },
+        ];
+    }
+  };
+
+  const authLinks = getAuthLinks();
 
   // Mobile drawer content
   const drawer = (
@@ -110,7 +140,7 @@ const Header = () => {
           fontWeight: 700,
         }}
       >
-        FoodShare
+        SAM
       </Typography>
       <Divider />
       <List>
@@ -121,57 +151,24 @@ const Header = () => {
               to={item.path}
               sx={{ textAlign: 'center' }}
             >
+              {item.icon && <ListItemIcon>{item.icon}</ListItemIcon>}
               <ListItemText primary={item.name} />
             </ListItemButton>
           </ListItem>
         ))}
         
-        {isAuthenticated && (
-          <>
-            {authLinks.map((item) => (
-              <ListItem key={item.name} disablePadding>
-                <ListItemButton 
-                  component={RouterLink} 
-                  to={item.path}
-                  sx={{ textAlign: 'center' }}
-                >
-                  <ListItemText primary={item.name} />
-                </ListItemButton>
-              </ListItem>
-            ))}
-            
-            {adminLinks.map((item) => (
-              <ListItem key={item.name} disablePadding>
-                <ListItemButton 
-                  component={RouterLink} 
-                  to={item.path}
-                  sx={{ textAlign: 'center' }}
-                >
-                  <ListItemText primary={item.name} />
-                </ListItemButton>
-              </ListItem>
-            ))}
-            
-            <ListItem disablePadding>
-              <ListItemButton 
-                component={RouterLink} 
-                to="/profile"
-                sx={{ textAlign: 'center' }}
-              >
-                <ListItemText primary="Profile" />
-              </ListItemButton>
-            </ListItem>
-            
-            <ListItem disablePadding>
-              <ListItemButton 
-                onClick={handleLogout}
-                sx={{ textAlign: 'center' }}
-              >
-                <ListItemText primary="Logout" />
-              </ListItemButton>
-            </ListItem>
-          </>
-        )}
+        {isAuthenticated && authLinks.map((item) => (
+          <ListItem key={item.name} disablePadding>
+            <ListItemButton 
+              component={RouterLink} 
+              to={item.path}
+              sx={{ textAlign: 'center' }}
+            >
+              {item.icon && <ListItemIcon>{item.icon}</ListItemIcon>}
+              <ListItemText primary={item.name} />
+            </ListItemButton>
+          </ListItem>
+        ))}
         
         {!isAuthenticated && (
           <>
@@ -181,6 +178,7 @@ const Header = () => {
                 to="/login"
                 sx={{ textAlign: 'center' }}
               >
+                <ListItemIcon><Login /></ListItemIcon>
                 <ListItemText primary="Login" />
               </ListItemButton>
             </ListItem>
@@ -190,6 +188,7 @@ const Header = () => {
                 to="/register"
                 sx={{ textAlign: 'center' }}
               >
+                <ListItemIcon><PersonAdd /></ListItemIcon>
                 <ListItemText primary="Register" />
               </ListItemButton>
             </ListItem>
@@ -218,22 +217,24 @@ const Header = () => {
                 textDecoration: 'none',
               }}
             >
-              FoodShare
+              SAM
             </Typography>
 
             {/* Mobile Menu Icon */}
-            <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
-              <IconButton
-                size="large"
-                aria-label="account of current user"
-                aria-controls="menu-appbar"
-                aria-haspopup="true"
-                onClick={handleDrawerToggle}
-                color="inherit"
-              >
-                <MenuIcon />
-              </IconButton>
-            </Box>
+            {isAuthenticated && (
+              <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
+                <IconButton
+                  size="large"
+                  aria-label="account of current user"
+                  aria-controls="menu-appbar"
+                  aria-haspopup="true"
+                  onClick={handleDrawerToggle}
+                  color="inherit"
+                >
+                  <MenuIcon />
+                </IconButton>
+              </Box>
+            )}
 
             {/* Mobile Logo */}
             <Typography
@@ -250,53 +251,43 @@ const Header = () => {
                 textDecoration: 'none',
               }}
             >
-              FoodShare
+              SAM
             </Typography>
 
-            {/* Desktop Navigation Links */}
-            <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-              {navLinks.map((page) => (
-                <Button
-                  key={page.name}
-                  component={RouterLink}
-                  to={page.path}
-                  sx={{ mx: 1, color: 'text.primary', display: 'flex', alignItems: 'center' }}
-                  startIcon={page.icon}
-                >
-                  {page.name}
-                </Button>
-              ))}
-              
-              {isAuthenticated && authLinks.map((page) => (
-                <Button
-                  key={page.name}
-                  component={RouterLink}
-                  to={page.path}
-                  sx={{ mx: 1, color: 'text.primary', display: 'flex', alignItems: 'center' }}
-                  startIcon={page.name === 'Cart' ? (
-                    <Badge badgeContent={cartItems.length} color="secondary">
-                      {page.icon}
-                    </Badge>
-                  ) : page.icon}
-                >
-                  {page.name}
-                </Button>
-              ))}
-              
-              {isAuthenticated && adminLinks.map((page) => (
-                <Button
-                  key={page.name}
-                  component={RouterLink}
-                  to={page.path}
-                  sx={{ mx: 1, color: 'text.primary', display: 'flex', alignItems: 'center' }}
-                  startIcon={page.icon}
-                >
-                  {page.name}
-                </Button>
-              ))}
-            </Box>
+            {/* Desktop Navigation Links - Only show when authenticated */}
+            {isAuthenticated && (
+              <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+                {navLinks.map((page) => (
+                  <Button
+                    key={page.name}
+                    component={RouterLink}
+                    to={page.path}
+                    sx={{ mx: 1, color: 'text.primary', display: 'flex', alignItems: 'center' }}
+                    startIcon={page.icon}
+                  >
+                    {page.name}
+                  </Button>
+                ))}
+                
+                {authLinks.map((page) => (
+                  <Button
+                    key={page.name}
+                    component={RouterLink}
+                    to={page.path}
+                    sx={{ mx: 1, color: 'text.primary', display: 'flex', alignItems: 'center' }}
+                    startIcon={page.name === 'Cart' ? (
+                      <Badge badgeContent={cartItems.length} color="secondary">
+                        {page.icon}
+                      </Badge>
+                    ) : page.icon}
+                  >
+                    {page.name}
+                  </Button>
+                ))}
+              </Box>
+            )}
             
-            {/* Cart Icon for Mobile */}
+            {/* Cart Icon for Mobile - Only show when authenticated */}
             {isAuthenticated && (
               <Box sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }}>
                 <IconButton 

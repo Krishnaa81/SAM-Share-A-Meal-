@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const cookieParser = require('cookie-parser');
 
 // Load environment variables
 dotenv.config();
@@ -10,7 +11,13 @@ dotenv.config();
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:5173', 'http://localhost:3000'], // Support both common frontend ports
+  credentials: true, // Allow cookies to be sent with requests
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+app.use(cookieParser()); // Add cookie-parser middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -96,11 +103,14 @@ app.get('/', (req, res) => {
 // API Routes
 app.use('/api/auth', require('./routes/auth.routes'));
 // app.use('/api/users', require('./routes/user.routes'));
-// app.use('/api/restaurants', require('./routes/restaurant.routes'));
-// app.use('/api/orders', require('./routes/order.routes'));
+app.use('/api/restaurants', require('./routes/restaurant.routes'));
+app.use('/api/orders', require('./routes/order.routes'));
 // app.use('/api/donations', require('./routes/donation.routes'));
 // app.use('/api/cloud-kitchen', require('./routes/cloudKitchen.routes'));
-// app.use('/api/csr', require('./routes/csr.routes'));
+app.use('/api/csr', require('./routes/csr.routes'));
+
+// Menu items routes
+app.use('/api/menu-items', require('./routes/menuItem.routes'));
 
 // Error handling middleware
 app.use((err, req, res, next) => {

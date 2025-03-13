@@ -51,53 +51,66 @@ const restaurantSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  cuisine: [{
+  cuisineType: [{
     type: String,
     required: true
   }],
   address: {
-    street: String,
-    city: String,
-    state: String,
-    zipCode: String,
-    country: String
-  },
-  location: {
-    type: {
+    street: {
       type: String,
-      enum: ['Point'],
-      default: 'Point'
+      required: true
+    },
+    city: {
+      type: String,
+      required: true
+    },
+    state: {
+      type: String,
+      required: true
+    },
+    zipCode: {
+      type: String,
+      required: true
     },
     coordinates: {
-      type: [Number],
-      default: [0, 0]
+      latitude: Number,
+      longitude: Number
     }
   },
-  contactPhone: {
-    type: String,
-    required: true
+  contactInfo: {
+    phone: {
+      type: String,
+      required: true
+    },
+    email: {
+      type: String,
+      required: true
+    },
+    website: String
   },
-  contactEmail: {
-    type: String,
-    required: true
-  },
-  openingHours: {
-    monday: { open: String, close: String },
-    tuesday: { open: String, close: String },
-    wednesday: { open: String, close: String },
-    thursday: { open: String, close: String },
-    friday: { open: String, close: String },
-    saturday: { open: String, close: String },
-    sunday: { open: String, close: String }
+  businessHours: {
+    monday: { open: String, close: String, isClosed: Boolean },
+    tuesday: { open: String, close: String, isClosed: Boolean },
+    wednesday: { open: String, close: String, isClosed: Boolean },
+    thursday: { open: String, close: String, isClosed: Boolean },
+    friday: { open: String, close: String, isClosed: Boolean },
+    saturday: { open: String, close: String, isClosed: Boolean },
+    sunday: { open: String, close: String, isClosed: Boolean }
   },
   images: [{
     type: String
   }],
-  coverImage: {
-    type: String,
-    default: ''
+  logo: {
+    type: String
   },
-  menu: [menuItemSchema],
+  menuCategories: [{
+    name: String,
+    description: String
+  }],
+  featuredItems: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'MenuItem'
+  }],
   ratings: {
     average: {
       type: Number,
@@ -112,55 +125,155 @@ const restaurantSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Review'
   }],
-  subscription: {
-    plan: {
-      type: String,
-      enum: ['none', 'basic', 'premium', 'premium_plus'],
-      default: 'none'
-    },
-    startDate: Date,
-    endDate: Date,
-    isActive: {
+  priceRange: {
+    type: String,
+    enum: ['$', '$$', '$$$', '$$$$'],
+    default: '$$'
+  },
+  deliveryOptions: {
+    selfPickup: {
       type: Boolean,
-      default: false
+      default: true
     },
-    commissionRate: {
+    delivery: {
+      type: Boolean,
+      default: true
+    },
+    deliveryFee: {
       type: Number,
-      default: 15 // default commission rate in percentage
+      default: 0
+    },
+    estimatedDeliveryTime: {
+      min: Number,
+      max: Number
+    },
+    deliveryRadius: {
+      type: Number,
+      default: 5 // in kilometers
     }
   },
-  isVerified: {
-    type: Boolean,
-    default: false
+  paymentOptions: {
+    cash: {
+      type: Boolean,
+      default: true
+    },
+    creditCard: {
+      type: Boolean,
+      default: true
+    },
+    upi: {
+      type: Boolean,
+      default: true
+    }
+  },
+  tags: [{
+    type: String
+  }],
+  specialFeatures: [{
+    type: String
+  }],
+  businessLicense: {
+    number: String,
+    expiryDate: Date,
+    verificationStatus: {
+      type: String,
+      enum: ['pending', 'verified', 'rejected'],
+      default: 'pending'
+    }
+  },
+  fssaiLicense: {
+    number: String,
+    expiryDate: Date,
+    verificationStatus: {
+      type: String,
+      enum: ['pending', 'verified', 'rejected'],
+      default: 'pending'
+    }
   },
   isActive: {
     type: Boolean,
     default: true
   },
-  deliveryRadius: {
+  subscriptionPlan: {
+    type: String,
+    enum: ['free', 'basic', 'premium', 'enterprise'],
+    default: 'free'
+  },
+  subscriptionDetails: {
+    startDate: Date,
+    endDate: Date,
+    autoRenewal: {
+      type: Boolean,
+      default: false
+    },
+    paymentId: String
+  },
+  commissionRate: {
     type: Number,
-    default: 5 // in kilometers
+    default: 10 // Percentage
   },
-  minOrderAmount: {
-    type: Number,
-    default: 0
+  bankDetails: {
+    accountName: String,
+    accountNumber: String,
+    ifscCode: String,
+    bankName: String
   },
-  avgPrepTime: {
-    type: Number,
-    default: 30 // in minutes
+  gstDetails: {
+    gstNumber: String,
+    verificationStatus: {
+      type: String,
+      enum: ['pending', 'verified', 'rejected'],
+      default: 'pending'
+    }
   },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now
+  stats: {
+    totalOrders: {
+      type: Number,
+      default: 0
+    },
+    totalRevenue: {
+      type: Number,
+      default: 0
+    },
+    averageOrderValue: {
+      type: Number,
+      default: 0
+    },
+    totalCustomers: {
+      type: Number,
+      default: 0
+    }
   }
-}, { timestamps: true });
+}, {
+  timestamps: true
+});
 
-// Create index for geo-spatial queries
-restaurantSchema.index({ location: '2dsphere' });
+// Add indexes for performance
+restaurantSchema.index({ name: 'text', 'address.city': 'text', cuisineType: 1 });
+restaurantSchema.index({ 'address.city': 1, 'address.state': 1 });
+restaurantSchema.index({ owner: 1 });
+restaurantSchema.index({ isActive: 1 });
+
+// Virtual for full address
+restaurantSchema.virtual('fullAddress').get(function() {
+  return `${this.address.street}, ${this.address.city}, ${this.address.state} ${this.address.zipCode}`;
+});
+
+// Method to check if restaurant is open at a given time
+restaurantSchema.methods.isOpenNow = function() {
+  const now = new Date();
+  const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+  const today = days[now.getDay()];
+  
+  const hours = this.businessHours[today];
+  if (hours.isClosed) return false;
+  
+  const currentTime = now.getHours() * 100 + now.getMinutes();
+  const openTime = parseInt(hours.open.replace(':', ''));
+  const closeTime = parseInt(hours.close.replace(':', ''));
+  
+  return currentTime >= openTime && currentTime <= closeTime;
+};
 
 const Restaurant = mongoose.model('Restaurant', restaurantSchema);
 

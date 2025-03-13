@@ -184,20 +184,20 @@ const DonateMoney = () => {
   };
 
   const predefinedAmounts = [
-    { value: '10', label: '$10' },
-    { value: '25', label: '$25' },
-    { value: '50', label: '$50' },
-    { value: '100', label: '$100' },
-    { value: '500', label: '$500' },
+    { value: '10', label: '₹10' },
+    { value: '25', label: '₹25' },
+    { value: '50', label: '₹50' },
+    { value: '100', label: '₹100' },
+    { value: '500', label: '₹500' },
     { value: 'custom', label: 'Custom' }
   ];
 
   const impactExamples = [
-    { amount: '$10', description: 'Provides a meal for a family of four' },
-    { amount: '$25', description: 'Helps feed 10 children for a day' },
-    { amount: '$50', description: 'Supports a community kitchen for a meal service' },
-    { amount: '$100', description: 'Provides emergency food assistance for a week' },
-    { amount: '$500', description: 'Funds a neighborhood food distribution event' }
+    { amount: '₹10', description: 'Provides a meal for a family of four' },
+    { amount: '₹25', description: 'Helps feed 10 children for a day' },
+    { amount: '₹50', description: 'Supports a community kitchen for a meal service' },
+    { amount: '₹100', description: 'Provides emergency food assistance for a week' },
+    { amount: '₹500', description: 'Funds a neighborhood food distribution event' }
   ];
 
   if (success) {
@@ -207,7 +207,7 @@ const DonateMoney = () => {
           <CheckCircle color="success" sx={{ fontSize: 60, mb: 2 }} />
           <Typography variant="h4" gutterBottom>Thank You for Your Donation!</Typography>
           <Typography variant="body1" paragraph>
-            Your donation of {amount === 'custom' ? `$${customAmount}` : `$${amount}`} has been processed successfully.
+            Your donation of {amount === 'custom' ? `₹${customAmount}` : `₹${amount}`} has been processed successfully.
             Your generosity will help provide meals to those in need.
           </Typography>
           <Typography variant="body1" paragraph>
@@ -244,7 +244,7 @@ const DonateMoney = () => {
             <CardMedia
               component="img"
               height="200"
-              image="https://source.unsplash.com/random/800x400/?charity,donation"
+              image="/images/donations/charity-donation.jpg"
               alt="Donation impact"
             />
             <CardContent>
@@ -330,7 +330,7 @@ const DonateMoney = () => {
                     value={customAmount}
                     onChange={handleCustomAmountChange}
                     InputProps={{
-                      startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                      startAdornment: <InputAdornment position="start">₹</InputAdornment>,
                     }}
                     error={!!errors.amount && amount === 'custom'}
                   />
@@ -557,7 +557,7 @@ const DonateMoney = () => {
                 disabled={loading}
                 startIcon={loading ? <CircularProgress size={20} /> : <FavoriteBorder />}
               >
-                {loading ? 'Processing...' : `Donate ${amount === 'custom' ? (customAmount ? `$${customAmount}` : '') : `$${amount}`}`}
+                {loading ? 'Processing...' : `Donate ${amount === 'custom' ? (customAmount ? `₹${customAmount}` : '') : `₹${amount}`}`}
               </Button>
             </Box>
             

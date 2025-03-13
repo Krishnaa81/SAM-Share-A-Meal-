@@ -362,7 +362,7 @@ const Dashboard = () => {
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Box>
                   <Typography variant="body2" color="text.secondary">Total Revenue</Typography>
-                  <Typography variant="h4">${analytics.totalRevenue.toLocaleString()}</Typography>
+                  <Typography variant="h4">₹{analytics.totalRevenue.toLocaleString()}</Typography>
                 </Box>
                 <AttachMoney color="success" sx={{ fontSize: 40 }} />
               </Box>
@@ -437,7 +437,7 @@ const Dashboard = () => {
                         <TableRow key={order._id} hover>
                           <TableCell>{order.orderNumber}</TableCell>
                           <TableCell>{order.customer}</TableCell>
-                          <TableCell>${order.totalAmount.toFixed(2)}</TableCell>
+                          <TableCell>₹{order.totalAmount.toFixed(2)}</TableCell>
                           <TableCell>
                             <Chip
                               label={order.status}
@@ -479,7 +479,7 @@ const Dashboard = () => {
                           <TableCell>
                             {donation.type === 'food' 
                               ? donation.description 
-                              : `$${donation.amount}`
+                              : `₹${donation.amount}`
                             }
                           </TableCell>
                           <TableCell>
@@ -591,7 +591,7 @@ const Dashboard = () => {
                     <TableCell>{order.orderNumber}</TableCell>
                     <TableCell>{order.customer}</TableCell>
                     <TableCell>{order.items}</TableCell>
-                    <TableCell>${order.totalAmount.toFixed(2)}</TableCell>
+                    <TableCell>₹{order.totalAmount.toFixed(2)}</TableCell>
                     <TableCell>{formatDate(order.createdAt)}</TableCell>
                     <TableCell>
                       <Chip
@@ -860,7 +860,7 @@ const Dashboard = () => {
                     <TableCell>
                       {donation.type === 'food' 
                         ? donation.description 
-                        : donation.amount ? `$${donation.amount}` : ''
+                        : donation.amount ? `₹${donation.amount}` : ''
                       }
                     </TableCell>
                     <TableCell>{formatDate(donation.createdAt)}</TableCell>

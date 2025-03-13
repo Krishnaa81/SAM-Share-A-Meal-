@@ -43,122 +43,107 @@ import {
 } from '@mui/icons-material';
 
 import { useCart } from '../context/CartContext';
+import * as imageUtils from '../utils/imageUtils';
 
 // Mock restaurant data
 const MOCK_RESTAURANTS = [
   {
     id: 1,
-    name: 'Spice Garden',
-    image: 'https://source.unsplash.com/random/1200x400/?restaurant,indian',
-    cuisine: 'Indian',
-    rating: 4.8,
-    ratingCount: 256,
-    priceLevel: '$$',
-    deliveryTime: '20-30 min',
-    deliveryFee: 30,
-    minOrder: 150,
-    featured: true,
-    location: 'Jubilee Hills',
-    address: '123 Food Street, Jubilee Hills, Hyderabad',
-    phone: '+91 9876543210',
-    openingHours: '10:00 AM - 10:00 PM',
-    description: 'Authentic Indian restaurant offering a wide range of dishes from North and South India. Known for our flavorful curries, tandoori specialties, and freshly baked naan.',
+    name: 'Spice Junction',
+    cuisine: 'North Indian',
+    address: 'Shop 4, Jubilee Hills, Hyderabad',
+    rating: 4.5,
+    delivery_time: '30-40 min',
+    price_range: '₹₹₹',
+    image: '/images/restaurants/spice-junction.jpg',
     menu: [
       {
         category: 'Starters',
         items: [
-          { id: 101, name: 'Paneer Tikka', description: 'Marinated cottage cheese grilled to perfection', price: 220, image: 'https://source.unsplash.com/random/300x200/?paneer,tikka', vegetarian: true, bestseller: true },
-          { id: 102, name: 'Chicken 65', description: 'Spicy deep-fried chicken with South Indian spices', price: 250, image: 'https://source.unsplash.com/random/300x200/?chicken', vegetarian: false },
-          { id: 103, name: 'Samosa', description: 'Crispy pastry filled with spiced potatoes and peas', price: 80, image: 'https://source.unsplash.com/random/300x200/?samosa', vegetarian: true },
-          { id: 104, name: 'Fish Amritsari', description: 'Crispy fried fish marinated with Punjab spices', price: 320, image: 'https://source.unsplash.com/random/300x200/?fish,fried', vegetarian: false },
+          { id: 101, name: 'Paneer Tikka', description: 'Marinated cottage cheese grilled to perfection', price: 220, image: '/images/food/paneer-tikka.jpg', vegetarian: true, bestseller: true },
+          { id: 102, name: 'Chicken 65', description: 'Spicy deep-fried chicken with South Indian spices', price: 250, image: '/images/food/chicken-65.jpg', vegetarian: false },
+          { id: 103, name: 'Samosa', description: 'Crispy pastry filled with spiced potatoes and peas', price: 80, image: '/images/food/samosa.jpg', vegetarian: true },
+          { id: 104, name: 'Fish Amritsari', description: 'Crispy fried fish marinated with Punjab spices', price: 320, image: '/images/food/fish-amritsari.jpg', vegetarian: false },
         ]
       },
       {
         category: 'Main Course',
         items: [
-          { id: 201, name: 'Butter Chicken', description: 'Tender chicken cooked in rich tomato and butter gravy', price: 340, image: 'https://source.unsplash.com/random/300x200/?butter,chicken', vegetarian: false, bestseller: true },
-          { id: 202, name: 'Paneer Butter Masala', description: 'Cottage cheese in a creamy tomato sauce', price: 280, image: 'https://source.unsplash.com/random/300x200/?paneer,masala', vegetarian: true },
-          { id: 203, name: 'Dal Makhani', description: 'Black lentils cooked with butter and cream', price: 220, image: 'https://source.unsplash.com/random/300x200/?dal', vegetarian: true, bestseller: true },
-          { id: 204, name: 'Biryani', description: 'Fragrant rice cooked with spices and vegetables or meat', price: 320, image: 'https://source.unsplash.com/random/300x200/?biryani', vegetarian: false },
+          { id: 201, name: 'Butter Chicken', description: 'Tender chicken pieces in a rich butter and tomato gravy', price: 340, image: '/images/food/butter-chicken.jpg', vegetarian: false, bestseller: true },
+          { id: 202, name: 'Paneer Butter Masala', description: 'Cottage cheese in a creamy tomato sauce', price: 280, image: '/images/food/paneer-butter-masala.jpg', vegetarian: true },
+          { id: 203, name: 'Dal Makhani', description: 'Black lentils cooked with butter and cream', price: 220, image: '/images/food/dal-makhani.jpg', vegetarian: true, bestseller: true },
+          { id: 204, name: 'Chicken Biryani', description: 'Fragrant rice cooked with spices and meat', price: 320, image: '/images/food/chicken-biryani.jpg', vegetarian: false },
         ]
       },
       {
-        category: 'Bread & Rice',
+        category: 'Breads & Rice',
         items: [
-          { id: 301, name: 'Naan', description: 'Leavened flatbread baked in tandoor', price: 40, image: 'https://source.unsplash.com/random/300x200/?naan', vegetarian: true },
-          { id: 302, name: 'Jeera Rice', description: 'Basmati rice tempered with cumin seeds', price: 120, image: 'https://source.unsplash.com/random/300x200/?rice', vegetarian: true },
-          { id: 303, name: 'Laccha Paratha', description: 'Multi-layered flatbread', price: 60, image: 'https://source.unsplash.com/random/300x200/?paratha', vegetarian: true },
+          { id: 301, name: 'Naan', description: 'Leavened flatbread baked in tandoor', price: 40, image: '/images/food/naan.jpg', vegetarian: true },
+          { id: 302, name: 'Jeera Rice', description: 'Basmati rice tempered with cumin seeds', price: 120, image: '/images/food/jeera-rice.jpg', vegetarian: true },
+          { id: 303, name: 'Laccha Paratha', description: 'Multi-layered flatbread', price: 60, image: '/images/food/laccha-paratha.jpg', vegetarian: true },
         ]
       },
       {
         category: 'Desserts',
         items: [
-          { id: 401, name: 'Gulab Jamun', description: 'Deep-fried milk solids soaked in sugar syrup', price: 120, image: 'https://source.unsplash.com/random/300x200/?dessert,indian', vegetarian: true, bestseller: true },
-          { id: 402, name: 'Rasmalai', description: 'Sweet cottage cheese dumplings in flavored milk', price: 150, image: 'https://source.unsplash.com/random/300x200/?sweet,indian', vegetarian: true },
+          { id: 401, name: 'Gulab Jamun', description: 'Deep-fried milk solids soaked in sugar syrup', price: 120, image: '/images/food/gulab-jamun.jpg', vegetarian: true, bestseller: true },
+          { id: 402, name: 'Rasmalai', description: 'Sweet cottage cheese dumplings in flavored milk', price: 150, image: '/images/food/rasmalai.jpg', vegetarian: true },
         ]
       }
     ],
     reviews: [
-      { id: 1, user: 'Priya S.', rating: 5, date: '2023-05-15', comment: 'Authentic flavors! The Butter Chicken and Naan were absolutely delicious.', avatar: 'https://source.unsplash.com/random/100x100/?portrait,woman' },
-      { id: 2, user: 'Rahul M.', rating: 4, date: '2023-04-22', comment: 'Great food, though delivery took a bit longer than expected.', avatar: 'https://source.unsplash.com/random/100x100/?portrait,man' },
-      { id: 3, user: 'Ananya T.', rating: 5, date: '2023-03-10', comment: 'Best Indian food in the city! The Dal Makhani is exceptional.', avatar: 'https://source.unsplash.com/random/100x100/?portrait,girl' },
+      { id: 1, user: 'Priya S.', rating: 5, date: '2023-05-15', comment: 'Amazing food and quick delivery. The Butter Chicken is absolutely delicious.', avatar: '/images/avatars/avatar1.jpg' },
+      { id: 2, user: 'Rahul M.', rating: 3, date: '2023-05-10', comment: 'Food was good but delivery took longer than expected.', avatar: '/images/avatars/avatar2.jpg' },
+      { id: 3, user: 'Ananya K.', rating: 4, date: '2023-05-05', comment: 'Great restaurant! The Chicken Biryani is exceptional.', avatar: '/images/avatars/avatar3.jpg' },
     ]
   },
   {
     id: 2,
     name: 'Pasta Paradise',
-    image: 'https://source.unsplash.com/random/1200x400/?restaurant,italian',
     cuisine: 'Italian',
-    rating: 4.5,
-    ratingCount: 182,
-    priceLevel: '$$$',
-    deliveryTime: '25-35 min',
-    deliveryFee: 50,
-    minOrder: 250,
-    featured: false,
-    location: 'Banjara Hills',
-    address: '456 Cuisine Avenue, Banjara Hills, Hyderabad',
-    phone: '+91 9876543211',
-    openingHours: '11:00 AM - 11:00 PM',
-    description: 'Authentic Italian cuisine featuring handmade pasta, wood-fired pizzas, and classic Italian desserts. All our ingredients are sourced from premium suppliers, including some imported directly from Italy.',
+    address: 'Plot 22, Banjara Hills, Hyderabad',
+    rating: 4.2,
+    delivery_time: '35-45 min',
+    price_range: '₹₹₹',
+    image: '/images/restaurants/pasta-paradise.jpg',
     menu: [
       {
         category: 'Starters',
         items: [
-          { id: 101, name: 'Bruschetta', description: 'Grilled bread topped with tomatoes, basil, and olive oil', price: 180, image: 'https://source.unsplash.com/random/300x200/?bruschetta', vegetarian: true, bestseller: true },
-          { id: 102, name: 'Calamari Fritti', description: 'Crispy fried calamari served with marinara sauce', price: 350, image: 'https://source.unsplash.com/random/300x200/?calamari', vegetarian: false },
-          { id: 103, name: 'Caprese Salad', description: 'Fresh mozzarella, tomatoes, and basil drizzled with balsamic glaze', price: 220, image: 'https://source.unsplash.com/random/300x200/?caprese', vegetarian: true },
+          { id: 101, name: 'Bruschetta', description: 'Grilled bread topped with tomatoes, garlic and olive oil', price: 180, image: '/images/food/bruschetta.jpg', vegetarian: true, bestseller: true },
+          { id: 102, name: 'Fried Calamari', description: 'Crispy calamari rings served with marinara sauce', price: 350, image: '/images/food/calamari.jpg', vegetarian: false },
+          { id: 103, name: 'Caprese Salad', description: 'Fresh mozzarella, tomatoes, and basil with balsamic glaze', price: 220, image: '/images/food/caprese.jpg', vegetarian: true },
         ]
       },
       {
         category: 'Pasta',
         items: [
-          { id: 201, name: 'Spaghetti Carbonara', description: 'Spaghetti with eggs, cheese, pancetta, and black pepper', price: 320, image: 'https://source.unsplash.com/random/300x200/?carbonara', vegetarian: false },
-          { id: 202, name: 'Fettuccine Alfredo', description: 'Fettuccine tossed in creamy parmesan sauce', price: 340, image: 'https://source.unsplash.com/random/300x200/?alfredo', vegetarian: true, bestseller: true },
-          { id: 203, name: 'Penne Arrabbiata', description: 'Penne pasta in spicy tomato sauce', price: 280, image: 'https://source.unsplash.com/random/300x200/?pasta,tomato', vegetarian: true },
-          { id: 204, name: 'Lasagna', description: 'Layered pasta with meat sauce and cheese', price: 380, image: 'https://source.unsplash.com/random/300x200/?lasagna', vegetarian: false, bestseller: true },
+          { id: 201, name: 'Spaghetti Carbonara', description: 'Classic pasta with eggs, cheese, pancetta and black pepper', price: 320, image: '/images/food/carbonara.jpg', vegetarian: false },
+          { id: 202, name: 'Fettuccine Alfredo', description: 'Fettuccine tossed in creamy parmesan sauce', price: 340, image: '/images/food/alfredo.jpg', vegetarian: true, bestseller: true },
+          { id: 203, name: 'Penne Arrabbiata', description: 'Penne pasta in spicy tomato sauce', price: 280, image: '/images/food/arrabbiata.jpg', vegetarian: true },
+          { id: 204, name: 'Lasagna', description: 'Layered pasta with meat sauce and cheese', price: 380, image: '/images/food/lasagna.jpg', vegetarian: false, bestseller: true },
         ]
       },
       {
         category: 'Pizza',
         items: [
-          { id: 301, name: 'Margherita', description: 'Classic pizza with tomato sauce, mozzarella, and basil', price: 300, image: 'https://source.unsplash.com/random/300x200/?pizza,margherita', vegetarian: true, bestseller: true },
-          { id: 302, name: 'Pepperoni', description: 'Pizza topped with pepperoni and cheese', price: 380, image: 'https://source.unsplash.com/random/300x200/?pizza,pepperoni', vegetarian: false },
-          { id: 303, name: 'Quattro Formaggi', description: 'Four cheese pizza with mozzarella, gorgonzola, fontina, and parmesan', price: 420, image: 'https://source.unsplash.com/random/300x200/?pizza,cheese', vegetarian: true },
+          { id: 301, name: 'Margherita', description: 'Classic pizza with tomato sauce, mozzarella, and basil', price: 300, image: '/images/food/margherita.jpg', vegetarian: true, bestseller: true },
+          { id: 302, name: 'Pepperoni', description: 'Pizza topped with pepperoni and cheese', price: 380, image: '/images/food/pepperoni.jpg', vegetarian: false },
+          { id: 303, name: 'Quattro Formaggi', description: 'Four cheese pizza with mozzarella, gorgonzola, fontina, and parmesan', price: 420, image: '/images/food/quattro-formaggi.jpg', vegetarian: true },
         ]
       },
       {
         category: 'Desserts',
         items: [
-          { id: 401, name: 'Tiramisu', description: 'Coffee-flavored Italian dessert with mascarpone cheese', price: 180, image: 'https://source.unsplash.com/random/300x200/?tiramisu', vegetarian: true, bestseller: true },
-          { id: 402, name: 'Panna Cotta', description: 'Italian custard dessert with berry compote', price: 160, image: 'https://source.unsplash.com/random/300x200/?panna,cotta', vegetarian: true },
+          { id: 401, name: 'Tiramisu', description: 'Coffee-flavored dessert with layers of ladyfingers and mascarpone cheese', price: 180, image: '/images/food/tiramisu.jpg', vegetarian: true, bestseller: true },
+          { id: 402, name: 'Panna Cotta', description: 'Italian custard dessert with berry compote', price: 160, image: '/images/food/panna-cotta.jpg', vegetarian: true },
         ]
       }
     ],
     reviews: [
-      { id: 1, user: 'Vikram K.', rating: 5, date: '2023-06-10', comment: 'The Fettuccine Alfredo is the best I\'ve had outside of Italy!', avatar: 'https://source.unsplash.com/random/100x100/?portrait,indian,man' },
-      { id: 2, user: 'Meera P.', rating: 4, date: '2023-05-05', comment: 'Lovely ambiance and delicious pizza. A bit pricey though.', avatar: 'https://source.unsplash.com/random/100x100/?portrait,indian,woman' },
-      { id: 3, user: 'Arjun S.', rating: 5, date: '2023-04-15', comment: 'Amazing food and quick delivery. Will order again!', avatar: 'https://source.unsplash.com/random/100x100/?portrait,boy' },
+      { id: 1, user: 'Vikram P.', rating: 5, date: '2023-06-20', comment: 'Authentic Italian flavors. Best pasta I\'ve had outside of Italy!', avatar: '/images/avatars/avatar4.jpg' },
+      { id: 2, user: 'Meera J.', rating: 4, date: '2023-06-15', comment: 'Great ambiance and delicious food. A bit pricey though.', avatar: '/images/avatars/avatar5.jpg' },
+      { id: 3, user: 'Arjun S.', rating: 5, date: '2023-06-10', comment: 'The pizza is divine. Fast delivery too. Will order again!', avatar: '/images/avatars/avatar6.jpg' },
     ]
   },
 ];
@@ -304,13 +289,18 @@ const RestaurantDetail = () => {
       >
         <Box
           component="img"
-          src={restaurant.image}
-          alt={restaurant.name}
-          sx={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-          }}
+          {...imageUtils.createImageProps(
+            restaurant.image, 
+            restaurant.name, 
+            'restaurant',
+            {
+              sx: {
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+              }
+            }
+          )}
         />
         <Box 
           sx={{ 
@@ -374,28 +364,21 @@ const RestaurantDetail = () => {
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                   <Rating value={restaurant.rating} precision={0.1} readOnly size="small" />
                   <Typography variant="body2" sx={{ ml: 0.5 }}>
-                    {restaurant.rating} ({restaurant.ratingCount} reviews)
+                    {restaurant.rating} ({restaurant.reviews.length} reviews)
                   </Typography>
                 </Box>
                 <Chip 
                   icon={<AccessTimeIcon fontSize="small" />} 
-                  label={restaurant.deliveryTime} 
+                  label={restaurant.delivery_time} 
                   variant="outlined" 
                   size="small"
                 />
                 <Chip 
                   icon={<AttachMoneyIcon fontSize="small" />} 
-                  label={restaurant.priceLevel} 
+                  label={restaurant.price_range} 
                   variant="outlined" 
                   size="small"
                 />
-                {restaurant.featured && (
-                  <Chip 
-                    label="Featured" 
-                    color="secondary" 
-                    size="small"
-                  />
-                )}
               </Box>
 
               <Typography variant="body1" paragraph>
@@ -535,8 +518,7 @@ const RestaurantDetail = () => {
                                   height: '100%', 
                                   objectFit: 'cover'
                                 }}
-                                image={item.image}
-                                alt={item.name}
+                                {...imageUtils.createImageProps(item.image, item.name, 'food')}
                               />
                               {item.vegetarian && (
                                 <Box 
@@ -604,7 +586,7 @@ const RestaurantDetail = () => {
                       <Box>
                         <Rating value={restaurant.rating} precision={0.1} readOnly />
                         <Typography variant="body2" color="text.secondary">
-                          {restaurant.ratingCount} reviews
+                          {restaurant.reviews.length} reviews
                         </Typography>
                       </Box>
                     </Box>
@@ -686,7 +668,7 @@ const RestaurantDetail = () => {
                         Delivery Information
                       </Typography>
                       <Typography variant="body1" paragraph>
-                        Delivery Time: {restaurant.deliveryTime}
+                        Delivery Time: {restaurant.delivery_time}
                       </Typography>
                       <Typography variant="body1" paragraph>
                         Delivery Fee: ₹{restaurant.deliveryFee}

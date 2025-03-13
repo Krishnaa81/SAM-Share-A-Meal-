@@ -18,14 +18,16 @@ import {
   TableRow,
   Button,
   IconButton,
-  Pagination
+  Pagination,
+  Snackbar
 } from '@mui/material';
 import { 
   ArrowForward, 
   AccessTime, 
   CheckCircle, 
   LocalShipping, 
-  ErrorOutline 
+  ErrorOutline,
+  Refresh as RefreshIcon
 } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
@@ -72,6 +74,53 @@ const getStatusIcon = (status) => {
   }
 };
 
+// Mock orders data for testing and fallback
+const MOCK_ORDERS = [
+  {
+    _id: 'ord123456789',
+    orderNumber: 'ORD-12345',
+    createdAt: new Date().toISOString(),
+    status: 'delivering',
+    totalAmount: 550,
+    items: [
+      { name: 'Butter Chicken', quantity: 1, price: 340 },
+      { name: 'Naan', quantity: 2, price: 40 },
+      { name: 'Jeera Rice', quantity: 1, price: 120 }
+    ],
+    restaurant: {
+      name: 'Spice Junction',
+      image: '/images/restaurants/spice-junction.jpg'
+    },
+    deliveryAddress: {
+      street: '123 Main Street',
+      city: 'Hyderabad',
+      state: 'Telangana',
+      zipCode: '500001'
+    }
+  },
+  {
+    _id: 'ord987654321',
+    orderNumber: 'ORD-54321',
+    createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days ago
+    status: 'completed',
+    totalAmount: 420,
+    items: [
+      { name: 'Margherita Pizza', quantity: 1, price: 300 },
+      { name: 'Coke', quantity: 2, price: 60 }
+    ],
+    restaurant: {
+      name: 'Pizza Paradise',
+      image: '/images/restaurants/pasta-paradise.jpg'
+    },
+    deliveryAddress: {
+      street: '456 Park Avenue',
+      city: 'Hyderabad',
+      state: 'Telangana',
+      zipCode: '500001'
+    }
+  }
+];
+
 const Orders = () => {
   const { user } = useAuth();
   const [orders, setOrders] = useState([]);
@@ -79,6 +128,8 @@ const Orders = () => {
   const [error, setError] = useState('');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
   const ordersPerPage = 5;
 
   useEffect(() => {
@@ -88,7 +139,11 @@ const Orders = () => {
         return;
       }
 
+      setLoading(true);
+      setError('');
+
       try {
+        // Try to get orders from API
         const config = {
           headers: {
             Authorization: `Bearer ${user.token}`
@@ -96,11 +151,34 @@ const Orders = () => {
         };
 
         const response = await axios.get('/api/orders', config);
-        setOrders(response.data);
-        setTotalPages(Math.ceil(response.data.length / ordersPerPage));
+        const fetchedOrders = response.data;
+        
+        // Save orders to localStorage for persistence
+        localStorage.setItem(`user_${user.id}_orders`, JSON.stringify(fetchedOrders));
+        
+        setOrders(fetchedOrders);
+        setTotalPages(Math.ceil(fetchedOrders.length / ordersPerPage));
         setLoading(false);
       } catch (error) {
-        setError('Failed to fetch orders. Please try again later.');
+        console.error('API fetch error:', error);
+        
+        // Try to load from localStorage as fallback
+        const savedOrders = localStorage.getItem(`user_${user.id}_orders`);
+        
+        if (savedOrders) {
+          const parsedOrders = JSON.parse(savedOrders);
+          setOrders(parsedOrders);
+          setTotalPages(Math.ceil(parsedOrders.length / ordersPerPage));
+          setSnackbarMessage('Showing saved orders. Connection to server failed.');
+          setSnackbarOpen(true);
+        } else {
+          // Use mock data as final fallback
+          setOrders(MOCK_ORDERS);
+          setTotalPages(Math.ceil(MOCK_ORDERS.length / ordersPerPage));
+          setSnackbarMessage('Showing sample orders. Connection to server failed.');
+          setSnackbarOpen(true);
+        }
+        
         setLoading(false);
       }
     };
@@ -108,8 +186,16 @@ const Orders = () => {
     fetchOrders();
   }, [user]);
 
+  const handleRefresh = async () => {
+    fetchOrders();
+  };
+
   const handlePageChange = (event, value) => {
     setPage(value);
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbarOpen(false);
   };
 
   // Get current page orders
@@ -137,11 +223,20 @@ const Orders = () => {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" gutterBottom>My Orders</Typography>
-        <Typography variant="body1" color="text.secondary">
-          View and manage all your orders
-        </Typography>
+      <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Box>
+          <Typography variant="h4" gutterBottom>My Orders</Typography>
+          <Typography variant="body1" color="text.secondary">
+            View and manage all your orders
+          </Typography>
+        </Box>
+        <Button 
+          variant="outlined" 
+          startIcon={<RefreshIcon />}
+          onClick={handleRefresh}
+        >
+          Refresh
+        </Button>
       </Box>
 
       {loading ? (
@@ -175,7 +270,7 @@ const Orders = () => {
                   <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Date</TableCell>
                   <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Total</TableCell>
                   <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Status</TableCell>
-                  <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Details</TableCell>
+                  <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -184,14 +279,14 @@ const Orders = () => {
                     <TableRow key={order._id} hover>
                       <TableCell>
                         <Typography variant="body2" fontWeight="medium">
-                          #{order._id.substring(order._id.length - 8)}
+                          #{order.orderNumber || order._id.substring(order._id.length - 8)}
                         </Typography>
                       </TableCell>
                       <TableCell>
                         <Typography variant="body2">{formatDate(order.createdAt)}</Typography>
                       </TableCell>
                       <TableCell>
-                        <Typography variant="body2" fontWeight="medium">${order.totalAmount.toFixed(2)}</Typography>
+                        <Typography variant="body2" fontWeight="medium">₹{order.totalAmount.toFixed(2)}</Typography>
                       </TableCell>
                       <TableCell>
                         <Chip
@@ -207,8 +302,18 @@ const Orders = () => {
                           to={`/orders/${order._id}`} 
                           color="primary"
                           size="small"
+                          title="View details"
                         >
                           <ArrowForward />
+                        </IconButton>
+                        <IconButton 
+                          component={Link} 
+                          to={`/order-tracking/${order._id}`} 
+                          color="secondary"
+                          size="small"
+                          title="Track order"
+                        >
+                          <LocalShipping />
                         </IconButton>
                       </TableCell>
                     </TableRow>
@@ -234,6 +339,13 @@ const Orders = () => {
           )}
         </>
       )}
+      
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        message={snackbarMessage}
+      />
     </Container>
   );
 };

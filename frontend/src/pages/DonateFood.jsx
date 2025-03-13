@@ -586,8 +586,8 @@ const DonateFood = () => {
           <Card sx={{ mb: 4 }}>
             <CardMedia
               component="img"
-              height="240"
-              image="https://source.unsplash.com/random/800x400/?food,sharing"
+              height="200"
+              image="/images/donations/food-sharing.jpg"
               alt="Food donation"
             />
             <CardContent>

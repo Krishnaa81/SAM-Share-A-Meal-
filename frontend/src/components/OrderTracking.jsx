@@ -26,73 +26,118 @@ import {
   LocationOn,
   Person,
   Phone,
+  Receipt,
 } from '@mui/icons-material';
 
-const steps = [
+// Define the possible steps and their properties
+const STEPS = [
   {
-    label: 'Order Confirmed',
+    status: 'Order Confirmed',
     icon: <RestaurantMenu />,
-    time: '12:30 PM',
+    description: 'Your order has been received by the restaurant',
   },
   {
-    label: 'Preparing',
+    status: 'Preparing',
     icon: <Kitchen />,
-    time: '12:35 PM',
+    description: 'The restaurant is preparing your food',
   },
   {
-    label: 'Out for Delivery',
+    status: 'Out for Delivery',
     icon: <LocalShipping />,
-    time: '12:50 PM',
+    description: 'Your order is on the way',
   },
   {
-    label: 'Delivered',
+    status: 'Delivered',
     icon: <CheckCircle />,
-    time: '1:15 PM',
+    description: 'Your order has been delivered',
   },
 ];
 
-export default function OrderTracking({ order }) {
-  // Mock order data
-  const orderDetails = {
-    id: '#123456',
-    status: 'Preparing',
-    restaurant: 'Tasty Bites',
-    items: [
-      { name: 'Butter Chicken', quantity: 1, price: '₹300' },
-      { name: 'Naan', quantity: 2, price: '₹60' },
-    ],
-    total: '₹360',
-    deliveryPartner: {
-      name: 'John Doe',
-      phone: '+91 9876543210',
-      rating: 4.8,
-      image: 'https://source.unsplash.com/random/100x100/?person',
-    },
-    estimatedDelivery: '1:15 PM',
-    deliveryAddress: '123, Main Street, Bangalore - 560001',
-  };
+// Format date
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+};
 
+// Handle image errors
+const handleImageError = (e) => {
+  e.target.onerror = null;
+  
+  // Set appropriate fallback based on context
+  if (e.target.classList.contains('restaurant-image')) {
+    e.target.src = '/images/restaurants/fallback-restaurant.jpg';
+  } else if (e.target.classList.contains('delivery-image')) {
+    e.target.src = '/images/avatars/fallback-avatar.jpg';
+  } else {
+    e.target.src = '/images/fallback-image.jpg';
+  }
+};
+
+export default function OrderTracking({ order }) {
+  // If no order provided, use empty defaults
+  if (!order) {
+    return (
+      <Paper sx={{ p: 3, textAlign: 'center' }}>
+        <Typography variant="h6">No order information available</Typography>
+      </Paper>
+    );
+  }
+
+  // Get the current status from the delivery tracking
+  const currentStatusObj = order.deliveryTracking && order.deliveryTracking.length > 0 
+    ? order.deliveryTracking[order.deliveryTracking.length - 1] 
+    : { status: 'Order Confirmed' };
+  
+  const currentStatus = currentStatusObj.status;
+
+  // Find the current step index
+  const currentStepIndex = STEPS.findIndex(step => step.status === currentStatus);
+
+  // Prepare the steps with timestamps from the tracking data
+  const stepsWithTimestamps = STEPS.map(step => {
+    const matchingTrack = order.deliveryTracking?.find(track => track.status === step.status);
+    return {
+      ...step,
+      time: matchingTrack ? formatDate(matchingTrack.timestamp) : '',
+      completed: !!matchingTrack,
+    };
+  });
+
+  // Get the status for a step (completed, active, or pending)
   const getStepStatus = (stepIndex) => {
-    const currentStep = steps.findIndex(step => step.label === orderDetails.status);
-    if (stepIndex < currentStep) return 'completed';
-    if (stepIndex === currentStep) return 'active';
+    if (stepIndex < currentStepIndex || stepsWithTimestamps[stepIndex].completed) return 'completed';
+    if (stepIndex === currentStepIndex) return 'active';
     return 'pending';
   };
 
+  // Format the delivery address
+  const formattedAddress = order.deliveryAddress ? 
+    `${order.deliveryAddress.line1}, ${order.deliveryAddress.line2 ? order.deliveryAddress.line2 + ', ' : ''}${order.deliveryAddress.city}, ${order.deliveryAddress.state} - ${order.deliveryAddress.pincode}` :
+    'No address provided';
+
   return (
     <Paper sx={{ p: 3, maxWidth: 800, mx: 'auto' }}>
-      <Typography variant="h5" gutterBottom>
-        Order Tracking
-      </Typography>
-      <Typography variant="subtitle1" color="text.secondary" gutterBottom>
-        Order ID: {orderDetails.id}
-      </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
+        <Box>
+          <Typography variant="h5" gutterBottom>
+            Order Tracking
+          </Typography>
+          <Typography variant="subtitle1" color="text.secondary">
+            Order ID: {order.id}
+          </Typography>
+        </Box>
+        <Chip 
+          label={currentStatus} 
+          color={currentStatus === 'Delivered' ? 'success' : 'primary'} 
+          variant="outlined"
+        />
+      </Box>
 
       {/* Order Status Stepper */}
       <Box sx={{ mb: 4 }}>
-        <Stepper activeStep={steps.findIndex(step => step.label === orderDetails.status)}>
-          {steps.map((step, index) => (
-            <Step key={step.label} completed={getStepStatus(index) === 'completed'}>
+        <Stepper activeStep={currentStepIndex} alternativeLabel>
+          {stepsWithTimestamps.map((step, index) => (
+            <Step key={step.status} completed={getStepStatus(index) === 'completed'}>
               <StepLabel StepIconComponent={() => (
                 <Avatar
                   sx={{
@@ -105,10 +150,12 @@ export default function OrderTracking({ order }) {
                   {step.icon}
                 </Avatar>
               )}>
-                <Typography variant="body2">{step.label}</Typography>
-                <Typography variant="caption" color="text.secondary">
-                  {step.time}
-                </Typography>
+                <Typography variant="body2">{step.status}</Typography>
+                {step.time && (
+                  <Typography variant="caption" color="text.secondary">
+                    {step.time}
+                  </Typography>
+                )}
               </StepLabel>
             </Step>
           ))}
@@ -116,67 +163,122 @@ export default function OrderTracking({ order }) {
       </Box>
 
       <Grid container spacing={3}>
-        {/* Order Details */}
+        {/* Restaurant Details */}
         <Grid item xs={12} md={6}>
           <Card variant="outlined">
             <CardContent>
               <Typography variant="h6" gutterBottom>
-                Order Details
+                Restaurant Details
               </Typography>
-              <List>
-                {orderDetails.items.map((item, index) => (
-                  <ListItem key={index} disablePadding>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                <Avatar
+                  src={order.restaurant?.image}
+                  alt={order.restaurant?.name}
+                  sx={{ width: 56, height: 56, mr: 2 }}
+                  className="restaurant-image"
+                  onError={handleImageError}
+                />
+                <Box>
+                  <Typography variant="subtitle1">
+                    {order.restaurant?.name}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {order.restaurant?.address}
+                  </Typography>
+                </Box>
+              </Box>
+              <Divider sx={{ my: 2 }} />
+              <Typography variant="subtitle2" gutterBottom>
+                Order Items
+              </Typography>
+              <List dense>
+                {order.items?.map((item, index) => (
+                  <ListItem key={index} disablePadding sx={{ py: 0.5 }}>
                     <ListItemText
-                      primary={item.name}
-                      secondary={`${item.quantity}x - ${item.price}`}
+                      primary={`${item.name} × ${item.quantity}`}
+                      secondary={`₹${item.price.toFixed(2)}`}
                     />
                   </ListItem>
                 ))}
               </List>
               <Divider sx={{ my: 2 }} />
-              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Typography variant="subtitle1">Total</Typography>
-                <Typography variant="subtitle1" fontWeight="bold">
-                  {orderDetails.total}
-                </Typography>
-              </Box>
+              <Grid container spacing={1}>
+                <Grid item xs={6}>
+                  <Typography variant="body2" color="text.secondary">Subtotal</Typography>
+                </Grid>
+                <Grid item xs={6} sx={{ textAlign: 'right' }}>
+                  <Typography variant="body2">₹{order.subtotal.toFixed(2)}</Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography variant="body2" color="text.secondary">Delivery Fee</Typography>
+                </Grid>
+                <Grid item xs={6} sx={{ textAlign: 'right' }}>
+                  <Typography variant="body2">₹{order.deliveryFee.toFixed(2)}</Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography variant="body2" color="text.secondary">Tax</Typography>
+                </Grid>
+                <Grid item xs={6} sx={{ textAlign: 'right' }}>
+                  <Typography variant="body2">₹{order.tax.toFixed(2)}</Typography>
+                </Grid>
+                <Grid item xs={12}>
+                  <Divider sx={{ my: 1 }} />
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography variant="subtitle2">Total</Typography>
+                </Grid>
+                <Grid item xs={6} sx={{ textAlign: 'right' }}>
+                  <Typography variant="subtitle2">₹{order.totalAmount.toFixed(2)}</Typography>
+                </Grid>
+                <Grid item xs={12}>
+                  <Chip 
+                    icon={<Receipt />}
+                    label={`Payment: ${order.paymentMethod}`} 
+                    size="small" 
+                    variant="outlined" 
+                    sx={{ mt: 1 }}
+                  />
+                </Grid>
+              </Grid>
             </CardContent>
           </Card>
         </Grid>
 
-        {/* Delivery Partner Details */}
+        {/* Delivery Details */}
         <Grid item xs={12} md={6}>
           <Card variant="outlined">
             <CardContent>
               <Typography variant="h6" gutterBottom>
-                Delivery Partner
+                Delivery Details
               </Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <Avatar
-                  src={orderDetails.deliveryPartner.image}
-                  sx={{ width: 56, height: 56, mr: 2 }}
-                />
-                <Box>
-                  <Typography variant="subtitle1">
-                    {orderDetails.deliveryPartner.name}
+              {order.deliveryPartner && (
+                <>
+                  <Typography variant="subtitle2" gutterBottom>
+                    Delivery Partner
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Rating: {orderDetails.deliveryPartner.rating} ⭐
-                  </Typography>
-                </Box>
-              </Box>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <Avatar
+                      src={order.deliveryPartner.image}
+                      sx={{ width: 56, height: 56, mr: 2 }}
+                      className="delivery-image"
+                      onError={handleImageError}
+                    />
+                    <Box>
+                      <Typography variant="subtitle1">
+                        {order.deliveryPartner.name}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Rating: {order.deliveryPartner.rating} ⭐
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Phone: {order.deliveryPartner.phone}
+                      </Typography>
+                    </Box>
+                  </Box>
+                </>
+              )}
+              <Divider sx={{ my: 2 }} />
               <List dense>
-                <ListItem>
-                  <ListItemAvatar>
-                    <Avatar>
-                      <Phone />
-                    </Avatar>
-                  </ListItemAvatar>
-                  <ListItemText
-                    primary="Contact"
-                    secondary={orderDetails.deliveryPartner.phone}
-                  />
-                </ListItem>
                 <ListItem>
                   <ListItemAvatar>
                     <Avatar>
@@ -184,8 +286,19 @@ export default function OrderTracking({ order }) {
                     </Avatar>
                   </ListItemAvatar>
                   <ListItemText
-                    primary="Estimated Delivery"
-                    secondary={orderDetails.estimatedDelivery}
+                    primary="Estimated Delivery Time"
+                    secondary={order.estimatedDelivery}
+                  />
+                </ListItem>
+                <ListItem>
+                  <ListItemAvatar>
+                    <Avatar>
+                      <Person />
+                    </Avatar>
+                  </ListItemAvatar>
+                  <ListItemText
+                    primary="Recipient"
+                    secondary={`${order.deliveryAddress?.name || 'N/A'} (${order.deliveryAddress?.phone || 'N/A'})`}
                   />
                 </ListItem>
                 <ListItem>
@@ -196,7 +309,7 @@ export default function OrderTracking({ order }) {
                   </ListItemAvatar>
                   <ListItemText
                     primary="Delivery Address"
-                    secondary={orderDetails.deliveryAddress}
+                    secondary={formattedAddress}
                   />
                 </ListItem>
               </List>

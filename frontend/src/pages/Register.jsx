@@ -117,14 +117,9 @@ const Register = () => {
     } catch (error) {
       console.error('Registration error:', error);
       
-      // Handle specific error messages
-      if (error.includes('User already exists')) {
-        setApiError('An account with this email already exists. Please use a different email or try logging in.');
-      } else if (error.includes('validation failed')) {
-        setApiError('Please check your information and try again.');
-      } else {
-        setApiError(error.toString() || 'An error occurred during registration. Please try again later.');
-      }
+      // Handle error properly
+      const errorMessage = error.message || 'An error occurred during registration.';
+      setApiError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }

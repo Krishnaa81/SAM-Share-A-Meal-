@@ -69,10 +69,20 @@ const Login = () => {
     setApiError('');
     
     try {
-      await login(formData.email, formData.password);
-      navigate('/');
+      const user = await login(formData.email, formData.password);
+      
+      // Redirect based on user role
+      const roleRedirectMap = {
+        'customer': '/',
+        'restaurant': '/restaurant-dashboard',
+        'corporate': '/csr-dashboard',
+        'cloudKitchen': '/kitchen-dashboard'
+      };
+      
+      const redirectPath = roleRedirectMap[user.role] || '/';
+      navigate(redirectPath);
     } catch (error) {
-      setApiError(error.toString());
+      setApiError(error.message || error.toString());
     } finally {
       setIsSubmitting(false);
     }
