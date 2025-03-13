@@ -28,6 +28,7 @@ import {
   Phone,
   Receipt,
 } from '@mui/icons-material';
+import ImageWithFallback from './ImageWithFallback';
 
 // Define the possible steps and their properties
 const STEPS = [
@@ -57,20 +58,6 @@ const STEPS = [
 const formatDate = (dateString) => {
   const date = new Date(dateString);
   return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-};
-
-// Handle image errors
-const handleImageError = (e) => {
-  e.target.onerror = null;
-  
-  // Set appropriate fallback based on context
-  if (e.target.classList.contains('restaurant-image')) {
-    e.target.src = '/images/restaurants/fallback-restaurant.jpg';
-  } else if (e.target.classList.contains('delivery-image')) {
-    e.target.src = '/images/avatars/fallback-avatar.jpg';
-  } else {
-    e.target.src = '/images/fallback-image.jpg';
-  }
 };
 
 export default function OrderTracking({ order }) {
@@ -172,12 +159,15 @@ export default function OrderTracking({ order }) {
               </Typography>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                 <Avatar
-                  src={order.restaurant?.image}
-                  alt={order.restaurant?.name}
                   sx={{ width: 56, height: 56, mr: 2 }}
-                  className="restaurant-image"
-                  onError={handleImageError}
-                />
+                >
+                  <ImageWithFallback
+                    src={order.restaurant?.image}
+                    alt={order.restaurant?.name}
+                    category="restaurant"
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                </Avatar>
                 <Box>
                   <Typography variant="subtitle1">
                     {order.restaurant?.name}
@@ -258,11 +248,15 @@ export default function OrderTracking({ order }) {
                   </Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                     <Avatar
-                      src={order.deliveryPartner.image}
                       sx={{ width: 56, height: 56, mr: 2 }}
-                      className="delivery-image"
-                      onError={handleImageError}
-                    />
+                    >
+                      <ImageWithFallback
+                        src={order.deliveryPartner.image}
+                        alt={`Delivery partner ${order.deliveryPartner.name}`}
+                        category="avatar"
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
+                    </Avatar>
                     <Box>
                       <Typography variant="subtitle1">
                         {order.deliveryPartner.name}

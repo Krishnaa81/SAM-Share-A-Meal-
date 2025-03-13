@@ -592,12 +592,71 @@ const Checkout = () => {
     setLoading(true);
     setError('');
     
+    // Generate a unique order ID
+    const newOrderId = `ORD${Math.floor(100000 + Math.random() * 900000)}`;
+    
+    // Create order object
+    const newOrder = {
+      _id: newOrderId,
+      orderNumber: newOrderId,
+      createdAt: new Date().toISOString(),
+      status: 'Order Confirmed',
+      totalAmount: total,
+      items: cartItems.map(item => ({
+        name: item.name,
+        quantity: item.quantity || 1,
+        price: item.price
+      })),
+      restaurant: {
+        name: cartItems[0]?.restaurantName || 'Cloud Kitchen',
+        image: cartItems[0]?.image || '/images/restaurants/default.jpg'
+      },
+      deliveryAddress: activeAddress,
+      paymentMethod: formData.paymentMethod
+    };
+    
     // Simulate API call
     setTimeout(() => {
-      setLoading(false);
-      setOrderSuccess(true);
-      setOrderId(`ORD${Math.floor(100000 + Math.random() * 900000)}`);
-      clearCart();
+      try {
+        // Get the localStorage key - use user ID if available, otherwise use 'guest'
+        const storageKey = `user_${user?.id || 'guest'}_orders`;
+        
+        // Get existing orders from localStorage
+        const savedOrdersJSON = localStorage.getItem(storageKey);
+        let savedOrders = [];
+        
+        if (savedOrdersJSON) {
+          try {
+            savedOrders = JSON.parse(savedOrdersJSON);
+            // Ensure it's an array
+            if (!Array.isArray(savedOrders)) {
+              savedOrders = [];
+            }
+          } catch (e) {
+            console.error('Error parsing saved orders:', e);
+            savedOrders = [];
+          }
+        }
+        
+        // Add new order to the beginning of the array
+        savedOrders.unshift(newOrder);
+        
+        // Save back to localStorage
+        localStorage.setItem(storageKey, JSON.stringify(savedOrders));
+        
+        // For debugging
+        console.log('Order saved to localStorage:', newOrder);
+        console.log('Storage key used:', storageKey);
+        
+        setLoading(false);
+        setOrderSuccess(true);
+        setOrderId(newOrderId);
+        clearCart();
+      } catch (error) {
+        console.error('Error saving order:', error);
+        setError('Failed to place order. Please try again.');
+        setLoading(false);
+      }
     }, 2000);
   };
   

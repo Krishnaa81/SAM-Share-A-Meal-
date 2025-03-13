@@ -26,6 +26,7 @@ import CSRCredits from './pages/CSRCredits';
 import DonationManagement from './pages/DonationManagement';
 import CloudKitchen from './pages/CloudKitchen';
 import CloudKitchens from './pages/CloudKitchens';
+import KitchenDetail from './pages/KitchenDetail';
 import CSRDashboard from './pages/dashboards/CSRDashboard';
 import NotFound from './pages/NotFound';
 import MenuManagement from './pages/MenuManagement';
@@ -185,6 +186,10 @@ function App() {
                   <Route 
                     path="/cloud-kitchens" 
                     element={<PrivateRoute><CloudKitchens /></PrivateRoute>} 
+                  />
+                  <Route 
+                    path="/cloud-kitchens/:id" 
+                    element={<PrivateRoute><KitchenDetail /></PrivateRoute>} 
                   />
                   <Route 
                     path="/profile" 

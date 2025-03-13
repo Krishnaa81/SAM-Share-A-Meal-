@@ -98,38 +98,25 @@ export default function CloudKitchens() {
     }
   }, [searchTerm]);
 
+  // Handle kitchen click to navigate to detail page
   const handleKitchenClick = (kitchenId) => {
-    // For now, show an alert instead of navigating to a non-existent route
-    alert(`Kitchen detail page for ${kitchenId} is coming soon!`);
-    // Uncomment when detail page is implemented:
-    // navigate(`/cloud-kitchens/${kitchenId}`);
+    navigate(`/cloud-kitchens/${kitchenId}`);
   };
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 8 }}>
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" gutterBottom>
-          Cloud Kitchens
-        </Typography>
-        <Typography variant="subtitle1" color="text.secondary">
-          Discover specialized cloud kitchens delivering delicious meals
-        </Typography>
-      </Box>
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Typography variant="h4" gutterBottom component="h1">
+        Cloud Kitchens
+      </Typography>
+      <Typography variant="body1" paragraph color="text.secondary">
+        Explore our network of cloud kitchens offering a variety of cuisines
+      </Typography>
 
-      {/* Search Bar */}
-      <Paper 
-        elevation={1} 
-        sx={{ 
-          p: 2, 
-          mb: 3, 
-          display: 'flex', 
-          alignItems: 'center',
-          borderRadius: 2,
-        }}
-      >
+      {/* Search bar */}
+      <Paper sx={{ p: 2, mb: 4 }}>
         <TextField
           fullWidth
-          placeholder="Search by kitchen name, cuisine, or location"
+          placeholder="Search kitchens by name, cuisine, or location..."
           variant="outlined"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -143,15 +130,18 @@ export default function CloudKitchens() {
         />
       </Paper>
 
-      {/* Cloud Kitchens Grid */}
+      {/* Kitchen listing */}
       {loading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
           <CircularProgress />
         </Box>
       ) : cloudKitchens.length === 0 ? (
         <Paper sx={{ p: 4, textAlign: 'center' }}>
-          <Typography variant="h6" color="text.secondary">
-            No cloud kitchens found matching your search.
+          <Typography variant="h6" paragraph>
+            No kitchens found
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            Try adjusting your search or filters
           </Typography>
         </Paper>
       ) : (
@@ -163,44 +153,56 @@ export default function CloudKitchens() {
                   height: '100%', 
                   display: 'flex', 
                   flexDirection: 'column',
-                  transition: 'transform 0.2s, box-shadow 0.2s',
+                  cursor: 'pointer',
+                  transition: 'transform 0.2s',
                   '&:hover': {
-                    transform: 'translateY(-5px)',
-                    boxShadow: '0px 6px 20px rgba(0, 0, 0, 0.1)',
-                    cursor: 'pointer',
-                  },
+                    transform: 'translateY(-4px)',
+                    boxShadow: 6,
+                  }
                 }}
                 onClick={() => handleKitchenClick(kitchen.id)}
               >
                 <CardMedia
                   component="img"
-                  height="180"
+                  height="200"
                   image={kitchen.image}
                   alt={kitchen.name}
+                  onError={(e) => {
+                    e.target.src = 'https://images.unsplash.com/photo-1565183928294-7063f23ce0f8?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTB8fGtpdGNoZW58ZW58MHx8MHx8&w=1000&q=80';
+                  }}
                 />
-                <CardContent sx={{ flexGrow: 1 }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
                     <Typography variant="h6" component="h2">
                       {kitchen.name}
                     </Typography>
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                      <Star sx={{ color: 'gold', mr: 0.5 }} fontSize="small" />
-                      <Typography variant="body2" fontWeight="bold">
+                      <Rating value={kitchen.rating} precision={0.1} size="small" readOnly />
+                      <Typography variant="body2" sx={{ ml: 0.5 }}>
                         {kitchen.rating}
                       </Typography>
                     </Box>
                   </Box>
-                  
-                  <Box sx={{ display: 'flex', alignItems: 'center', mt: 1, mb: 1 }}>
-                    <LocationOn fontSize="small" color="action" sx={{ mr: 0.5 }} />
-                    <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" color="text.secondary" paragraph>
+                    {kitchen.description}
+                  </Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mt: 'auto' }}>
+                    <LocationOn fontSize="small" color="action" />
+                    <Typography variant="body2" color="text.secondary" sx={{ ml: 0.5 }}>
                       {kitchen.location}
                     </Typography>
                   </Box>
-                  
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                    {kitchen.description}
-                  </Typography>
+                  <Button 
+                    variant="contained" 
+                    color="primary" 
+                    sx={{ mt: 2 }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleKitchenClick(kitchen.id);
+                    }}
+                  >
+                    View Kitchen
+                  </Button>
                 </CardContent>
               </Card>
             </Grid>

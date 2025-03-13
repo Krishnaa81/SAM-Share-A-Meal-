@@ -55,24 +55,24 @@ const MOCK_RESTAURANTS = [
     rating: 4.5,
     delivery_time: '30-40 min',
     price_range: '₹₹₹',
-    image: '/images/restaurants/spice-junction.jpg',
+    image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8cmVzdGF1cmFudHxlbnwwfHwwfHw%3D&w=1000&q=80',
     menu: [
       {
         category: 'Starters',
         items: [
-          { id: 101, name: 'Paneer Tikka', description: 'Marinated cottage cheese grilled to perfection', price: 220, image: '/images/food/paneer-tikka.jpg', vegetarian: true, bestseller: true },
-          { id: 102, name: 'Chicken 65', description: 'Spicy deep-fried chicken with South Indian spices', price: 250, image: '/images/food/chicken-65.jpg', vegetarian: false },
-          { id: 103, name: 'Samosa', description: 'Crispy pastry filled with spiced potatoes and peas', price: 80, image: '/images/food/samosa.jpg', vegetarian: true },
-          { id: 104, name: 'Fish Amritsari', description: 'Crispy fried fish marinated with Punjab spices', price: 320, image: '/images/food/fish-amritsari.jpg', vegetarian: false },
+          { id: 101, name: 'Paneer Tikka', description: 'Marinated cottage cheese grilled to perfection', price: 220, image: 'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8cGFuZWVyJTIwdGlra2F8ZW58MHx8MHx8&w=1000&q=80', vegetarian: true, bestseller: true },
+          { id: 102, name: 'Chicken 65', description: 'Spicy deep-fried chicken with South Indian spices', price: 250, image: 'https://images.unsplash.com/photo-1610057099431-d73a1c9d2f2f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8Y2hpY2tlbiUyMGZyaWVkfGVufDB8fDB8fA%3D%3D&w=1000&q=80', vegetarian: false },
+          { id: 103, name: 'Samosa', description: 'Crispy pastry filled with spiced potatoes and peas', price: 80, image: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8c2Ftb3NhfGVufDB8fDB8fA%3D%3D&w=1000&q=80', vegetarian: true },
+          { id: 104, name: 'Fish Amritsari', description: 'Crispy fried fish marinated with Punjab spices', price: 320, image: 'https://images.unsplash.com/photo-1594041680534-e8c8cdebd659?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8ZnJpZWQlMjBmaXNofGVufDB8fDB8fA%3D%3D&w=1000&q=80', vegetarian: false },
         ]
       },
       {
         category: 'Main Course',
         items: [
-          { id: 201, name: 'Butter Chicken', description: 'Tender chicken pieces in a rich butter and tomato gravy', price: 340, image: '/images/food/butter-chicken.jpg', vegetarian: false, bestseller: true },
-          { id: 202, name: 'Paneer Butter Masala', description: 'Cottage cheese in a creamy tomato sauce', price: 280, image: '/images/food/paneer-butter-masala.jpg', vegetarian: true },
-          { id: 203, name: 'Dal Makhani', description: 'Black lentils cooked with butter and cream', price: 220, image: '/images/food/dal-makhani.jpg', vegetarian: true, bestseller: true },
-          { id: 204, name: 'Chicken Biryani', description: 'Fragrant rice cooked with spices and meat', price: 320, image: '/images/food/chicken-biryani.jpg', vegetarian: false },
+          { id: 201, name: 'Butter Chicken', description: 'Tender chicken pieces in a rich butter and tomato gravy', price: 340, image: 'https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8YnV0dGVyJTIwY2hpY2tlbnxlbnwwfHwwfHw%3D&w=1000&q=80', vegetarian: false, bestseller: true },
+          { id: 202, name: 'Paneer Butter Masala', description: 'Cottage cheese in a creamy tomato sauce', price: 280, image: 'https://images.unsplash.com/photo-1631452180519-c014fe946bc7?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8cGFuZWVyJTIwYnV0dGVyJTIwbWFzYWxhfGVufDB8fDB8fA%3D%3D&w=1000&q=80', vegetarian: true },
+          { id: 203, name: 'Dal Makhani', description: 'Black lentils cooked with butter and cream', price: 220, image: 'https://images.unsplash.com/photo-1546833998-877b37c2e5c6?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8ZGFsJTIwbWFraGFuaXxlbnwwfHwwfHw%3D&w=1000&q=80', vegetarian: true, bestseller: true },
+          { id: 204, name: 'Chicken Biryani', description: 'Fragrant rice cooked with spices and meat', price: 320, image: 'https://images.unsplash.com/photo-1589302168068-964664d93dc0?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8YmlyeWFuaXxlbnwwfHwwfHw%3D&w=1000&q=80', vegetarian: false },
         ]
       },
       {
@@ -92,9 +92,9 @@ const MOCK_RESTAURANTS = [
       }
     ],
     reviews: [
-      { id: 1, user: 'Priya S.', rating: 5, date: '2023-05-15', comment: 'Amazing food and quick delivery. The Butter Chicken is absolutely delicious.', avatar: '/images/avatars/avatar1.jpg' },
-      { id: 2, user: 'Rahul M.', rating: 3, date: '2023-05-10', comment: 'Food was good but delivery took longer than expected.', avatar: '/images/avatars/avatar2.jpg' },
-      { id: 3, user: 'Ananya K.', rating: 4, date: '2023-05-05', comment: 'Great restaurant! The Chicken Biryani is exceptional.', avatar: '/images/avatars/avatar3.jpg' },
+      { id: 1, user: 'Priya S.', rating: 5, date: '2023-05-15', comment: 'Amazing food and quick delivery. The Butter Chicken is absolutely delicious.', avatar: 'https://randomuser.me/api/portraits/women/64.jpg' },
+      { id: 2, user: 'Rahul M.', rating: 3, date: '2023-05-10', comment: 'Food was good but delivery took longer than expected.', avatar: 'https://randomuser.me/api/portraits/men/32.jpg' },
+      { id: 3, user: 'Ananya K.', rating: 4, date: '2023-05-05', comment: 'Great restaurant! The Chicken Biryani is exceptional.', avatar: 'https://randomuser.me/api/portraits/women/45.jpg' },
     ]
   },
   {
@@ -105,31 +105,31 @@ const MOCK_RESTAURANTS = [
     rating: 4.2,
     delivery_time: '35-45 min',
     price_range: '₹₹₹',
-    image: '/images/restaurants/pasta-paradise.jpg',
+    image: 'https://images.unsplash.com/photo-1579684947550-22e945225d9a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MjB8fGl0YWxpYW4lMjByZXN0YXVyYW50fGVufDB8fDB8fA%3D%3D&w=1000&q=80',
     menu: [
       {
         category: 'Starters',
         items: [
-          { id: 101, name: 'Bruschetta', description: 'Grilled bread topped with tomatoes, garlic and olive oil', price: 180, image: '/images/food/bruschetta.jpg', vegetarian: true, bestseller: true },
-          { id: 102, name: 'Fried Calamari', description: 'Crispy calamari rings served with marinara sauce', price: 350, image: '/images/food/calamari.jpg', vegetarian: false },
-          { id: 103, name: 'Caprese Salad', description: 'Fresh mozzarella, tomatoes, and basil with balsamic glaze', price: 220, image: '/images/food/caprese.jpg', vegetarian: true },
+          { id: 101, name: 'Bruschetta', description: 'Grilled bread topped with tomatoes, garlic and olive oil', price: 180, image: 'https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8YnJ1c2NoZXR0YXxlbnwwfHwwfHw%3D&w=1000&q=80', vegetarian: true, bestseller: true },
+          { id: 102, name: 'Fried Calamari', description: 'Crispy calamari rings served with marinara sauce', price: 350, image: 'https://images.unsplash.com/photo-1599487489423-c9185348f0a8?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8ZnJpZWQlMjBjYWxhbWFyaXxlbnwwfHwwfHw%3D&w=1000&q=80', vegetarian: false },
+          { id: 103, name: 'Caprese Salad', description: 'Fresh mozzarella, tomatoes, and basil with balsamic glaze', price: 220, image: 'https://images.unsplash.com/photo-1592417817098-8fd3d9eb14a5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8Y2FwcmVzZSUyMHNhbGFkfGVufDB8fDB8fA%3D%3D&w=1000&q=80', vegetarian: true },
         ]
       },
       {
         category: 'Pasta',
         items: [
-          { id: 201, name: 'Spaghetti Carbonara', description: 'Classic pasta with eggs, cheese, pancetta and black pepper', price: 320, image: '/images/food/carbonara.jpg', vegetarian: false },
-          { id: 202, name: 'Fettuccine Alfredo', description: 'Fettuccine tossed in creamy parmesan sauce', price: 340, image: '/images/food/alfredo.jpg', vegetarian: true, bestseller: true },
-          { id: 203, name: 'Penne Arrabbiata', description: 'Penne pasta in spicy tomato sauce', price: 280, image: '/images/food/arrabbiata.jpg', vegetarian: true },
-          { id: 204, name: 'Lasagna', description: 'Layered pasta with meat sauce and cheese', price: 380, image: '/images/food/lasagna.jpg', vegetarian: false, bestseller: true },
+          { id: 201, name: 'Spaghetti Carbonara', description: 'Classic pasta with eggs, cheese, pancetta and black pepper', price: 320, image: 'https://images.unsplash.com/photo-1612874742237-6526221588e3?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8Y2FyYm9uYXJhfGVufDB8fDB8fA%3D%3D&w=1000&q=80', vegetarian: false },
+          { id: 202, name: 'Fettuccine Alfredo', description: 'Fettuccine tossed in creamy parmesan sauce', price: 340, image: 'https://images.unsplash.com/photo-1645112411341-6c4fd023882c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8ZmV0dHVjY2luZSUyMGFsZnJlZG98ZW58MHx8MHx8&w=1000&q=80', vegetarian: true, bestseller: true },
+          { id: 203, name: 'Penne Arrabbiata', description: 'Penne pasta in spicy tomato sauce', price: 280, image: 'https://images.unsplash.com/photo-1563379926898-05f4575a45d8?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8cGFzdGElMjBhcnJhYmJpYXRhfGVufDB8fDB8fA%3D%3D&w=1000&q=80', vegetarian: true },
+          { id: 204, name: 'Lasagna', description: 'Layered pasta with meat sauce and cheese', price: 380, image: 'https://images.unsplash.com/photo-1619895092538-128341789043?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8bGFzYWduYXxlbnwwfHwwfHw%3D&w=1000&q=80', vegetarian: false, bestseller: true },
         ]
       },
       {
         category: 'Pizza',
         items: [
-          { id: 301, name: 'Margherita', description: 'Classic pizza with tomato sauce, mozzarella, and basil', price: 300, image: '/images/food/margherita.jpg', vegetarian: true, bestseller: true },
-          { id: 302, name: 'Pepperoni', description: 'Pizza topped with pepperoni and cheese', price: 380, image: '/images/food/pepperoni.jpg', vegetarian: false },
-          { id: 303, name: 'Quattro Formaggi', description: 'Four cheese pizza with mozzarella, gorgonzola, fontina, and parmesan', price: 420, image: '/images/food/quattro-formaggi.jpg', vegetarian: true },
+          { id: 301, name: 'Margherita', description: 'Classic pizza with tomato sauce, mozzarella, and basil', price: 300, image: 'https://images.unsplash.com/photo-1604068549290-dea0e4a305ca?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NHx8bWFyZ2hlcml0YSUyMHBpenphfGVufDB8fDB8fA%3D%3D&w=1000&q=80', vegetarian: true, bestseller: true },
+          { id: 302, name: 'Pepperoni', description: 'Pizza topped with pepperoni and cheese', price: 380, image: 'https://images.unsplash.com/photo-1628840042765-356cda07504e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8cGVwcGVyb25pJTIwcGl6emF8ZW58MHx8MHx8&w=1000&q=80', vegetarian: false },
+          { id: 303, name: 'Quattro Formaggi', description: 'Four cheese pizza with mozzarella, gorgonzola, fontina, and parmesan', price: 420, image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8Y2hlZXNlJTIwcGl6emF8ZW58MHx8MHx8&w=1000&q=80', vegetarian: true },
         ]
       },
       {
@@ -141,9 +141,9 @@ const MOCK_RESTAURANTS = [
       }
     ],
     reviews: [
-      { id: 1, user: 'Vikram P.', rating: 5, date: '2023-06-20', comment: 'Authentic Italian flavors. Best pasta I\'ve had outside of Italy!', avatar: '/images/avatars/avatar4.jpg' },
-      { id: 2, user: 'Meera J.', rating: 4, date: '2023-06-15', comment: 'Great ambiance and delicious food. A bit pricey though.', avatar: '/images/avatars/avatar5.jpg' },
-      { id: 3, user: 'Arjun S.', rating: 5, date: '2023-06-10', comment: 'The pizza is divine. Fast delivery too. Will order again!', avatar: '/images/avatars/avatar6.jpg' },
+      { id: 1, user: 'Vikram P.', rating: 5, date: '2023-06-20', comment: 'Authentic Italian flavors. Best pasta I\'ve had outside of Italy!', avatar: 'https://randomuser.me/api/portraits/men/22.jpg' },
+      { id: 2, user: 'Meera J.', rating: 4, date: '2023-06-15', comment: 'Great ambiance and delicious food. A bit pricey though.', avatar: 'https://randomuser.me/api/portraits/women/28.jpg' },
+      { id: 3, user: 'Arjun S.', rating: 5, date: '2023-06-10', comment: 'The pizza is divine. Fast delivery too. Will order again!', avatar: 'https://randomuser.me/api/portraits/men/51.jpg' },
     ]
   },
 ];
@@ -184,7 +184,7 @@ const RestaurantDetail = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   
-  const { addToCart } = useCart();
+  const { addToCart, cartItems } = useCart();
 
   useEffect(() => {
     // Simulate API call to fetch restaurant details
@@ -241,6 +241,11 @@ const RestaurantDetail = () => {
     
     setSnackbarMessage(`${item.name} added to cart`);
     setSnackbarOpen(true);
+  };
+
+  // Handle proceeding to checkout
+  const handleProceedToCheckout = () => {
+    navigate('/checkout');
   };
 
   // Close snackbar
@@ -568,6 +573,20 @@ const RestaurantDetail = () => {
                         </Grid>
                       ))}
                     </Grid>
+
+                    {/* Confirm Order Button */}
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        size="large"
+                        onClick={handleProceedToCheckout}
+                        disabled={cartItems.length === 0}
+                        startIcon={<ShoppingCartIcon />}
+                      >
+                        Confirm Order ({cartItems.length > 0 ? cartItems.length : 0})
+                      </Button>
+                    </Box>
                   </Box>
                 ))}
               </TabPanel>

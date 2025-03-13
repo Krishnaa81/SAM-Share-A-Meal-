@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Container,
   Typography,
   Grid,
   Paper,
   Card,
+  CardMedia,
   CardContent,
   List,
   ListItem,
@@ -34,13 +36,15 @@ import {
   Switch,
   FormControlLabel,
   LinearProgress,
+  Snackbar,
+  Avatar,
 } from '@mui/material';
 import {
   Kitchen,
   RestaurantMenu,
   LocalShipping,
   Assessment,
-  Add,
+  Add as AddIcon,
   Edit,
   Delete,
   Store,
@@ -53,7 +57,11 @@ import {
   Category,
   AttachMoney,
   LocalOffer,
+  ShoppingCart,
+  RestaurantMenu as FoodIcon,
 } from '@mui/icons-material';
+import { useCart } from '../context/CartContext';
+import * as imageUtils from '../utils/imageUtils';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -70,6 +78,8 @@ function TabPanel(props) {
 }
 
 export default function CloudKitchen() {
+  const navigate = useNavigate();
+  const { addToCart, cartItems } = useCart();
   const [tabValue, setTabValue] = useState(0);
   const [openKitchenDialog, setOpenKitchenDialog] = useState(false);
   const [kitchenForm, setKitchenForm] = useState({
@@ -90,6 +100,8 @@ export default function CloudKitchen() {
     preparationTime: '',
     ingredients: '',
   });
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
 
   // Mock data
   const kitchens = [
@@ -164,6 +176,7 @@ export default function CloudKitchen() {
       isVegetarian: false,
       preparationTime: '25 mins',
       status: 'Available',
+      image: 'https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8YnV0dGVyJTIwY2hpY2tlbnxlbnwwfHwwfHw%3D&w=1000&q=80',
     },
     {
       id: 2,
@@ -173,6 +186,27 @@ export default function CloudKitchen() {
       isVegetarian: true,
       preparationTime: '20 mins',
       status: 'Available',
+      image: 'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8cGFuZWVyJTIwdGlra2F8ZW58MHx8MHx8&w=1000&q=80',
+    },
+    {
+      id: 3,
+      name: 'Dal Makhani',
+      category: 'Main Course',
+      price: '₹220',
+      isVegetarian: true,
+      preparationTime: '30 mins',
+      status: 'Available',
+      image: 'https://images.unsplash.com/photo-1546833998-877b37c2e5c6?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8ZGFsJTIwbWFraGFuaXxlbnwwfHwwfHw%3D&w=1000&q=80',
+    },
+    {
+      id: 4,
+      name: 'Veg Biryani',
+      category: 'Rice',
+      price: '₹280',
+      isVegetarian: true,
+      preparationTime: '35 mins',
+      status: 'Available',
+      image: 'https://images.unsplash.com/photo-1589302168068-964664d93dc0?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8YmlyeWFuaXxlbnwwfHwwfHw%3D&w=1000&q=80',
     },
   ];
 
@@ -205,6 +239,114 @@ export default function CloudKitchen() {
       preparationTime: '',
       ingredients: '',
     });
+  };
+
+  // Handle adding item to cart
+  const handleAddToCart = (item) => {
+    addToCart({
+      id: item.id,
+      name: item.name,
+      price: parseInt(item.price.replace('₹', '')),
+      image: item.image,
+      restaurantId: 'cloud-kitchen',
+      restaurantName: 'Cloud Kitchen',
+    });
+    
+    setSnackbarMessage(`${item.name} added to cart`);
+    setSnackbarOpen(true);
+  };
+
+  // Handle proceeding to checkout
+  const handleProceedToCheckout = () => {
+    navigate('/checkout');
+  };
+
+  // Close snackbar
+  const handleCloseSnackbar = () => {
+    setSnackbarOpen(false);
+  };
+
+  // Menu management tab content
+  const renderMenuTab = (menuItems, handleAddToCart, cartItems, handleProceedToCheckout) => {
+    return (
+      <>
+        <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between' }}>
+          <Typography variant="h6">Menu Items</Typography>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => setOpenMenuDialog(true)}
+          >
+            Add Menu Item
+          </Button>
+        </Box>
+        
+        <Grid container spacing={2} sx={{ mb: 3 }}>
+          {menuItems.map((item) => (
+            <Grid item xs={12} sm={6} md={4} key={item.id}>
+              <Card sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                <CardMedia
+                  component="img"
+                  height="160"
+                  {...imageUtils.createImageProps(
+                    item.image,
+                    item.name,
+                    'food',
+                    { sx: { objectFit: 'cover' } }
+                  )}
+                />
+                <CardContent sx={{ flexGrow: 1 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                    <Typography variant="h6" component="div">
+                      {item.name}
+                    </Typography>
+                    <Chip
+                      size="small"
+                      label={item.isVegetarian ? 'Veg' : 'Non-Veg'}
+                      color={item.isVegetarian ? 'success' : 'error'}
+                    />
+                  </Box>
+                  
+                  <Typography variant="body2" color="text.secondary" gutterBottom>
+                    Category: {item.category}
+                  </Typography>
+                  
+                  <Typography variant="body2" color="text.secondary" gutterBottom>
+                    Preparation Time: {item.preparationTime}
+                  </Typography>
+                  
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
+                    <Typography variant="h6" color="primary">
+                      {item.price}
+                    </Typography>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      startIcon={<AddIcon />}
+                      onClick={() => handleAddToCart(item)}
+                    >
+                      Add to Cart
+                    </Button>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+        
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<ShoppingCart />}
+            onClick={handleProceedToCheckout}
+            disabled={cartItems.length === 0}
+          >
+            Confirm Order ({cartItems.length})
+          </Button>
+        </Box>
+      </>
+    );
   };
 
   return (
@@ -289,7 +431,7 @@ export default function CloudKitchen() {
             <Typography variant="h6">Active Kitchens</Typography>
             <Button
               variant="contained"
-              startIcon={<Add />}
+              startIcon={<AddIcon />}
               onClick={() => setOpenKitchenDialog(true)}
             >
               Add Kitchen
@@ -340,69 +482,7 @@ export default function CloudKitchen() {
 
         {/* Menu Management Tab */}
         <TabPanel value={tabValue} index={1}>
-          <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between' }}>
-            <Typography variant="h6">Menu Items</Typography>
-            <Button
-              variant="contained"
-              startIcon={<Add />}
-              onClick={() => setOpenMenuDialog(true)}
-            >
-              Add Menu Item
-            </Button>
-          </Box>
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Category</TableCell>
-                  <TableCell>Price</TableCell>
-                  <TableCell>Type</TableCell>
-                  <TableCell>Prep Time</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell>Actions</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {menuItems.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell>{item.name}</TableCell>
-                    <TableCell>
-                      <Chip
-                        icon={<Category fontSize="small" />}
-                        label={item.category}
-                        size="small"
-                      />
-                    </TableCell>
-                    <TableCell>{item.price}</TableCell>
-                    <TableCell>
-                      <Chip
-                        label={item.isVegetarian ? 'Veg' : 'Non-Veg'}
-                        color={item.isVegetarian ? 'success' : 'error'}
-                        size="small"
-                      />
-                    </TableCell>
-                    <TableCell>{item.preparationTime}</TableCell>
-                    <TableCell>
-                      <Chip
-                        label={item.status}
-                        color="primary"
-                        size="small"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <IconButton size="small">
-                        <Edit />
-                      </IconButton>
-                      <IconButton size="small" color="error">
-                        <Delete />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+          {renderMenuTab(menuItems, handleAddToCart, cartItems, handleProceedToCheckout)}
         </TabPanel>
 
         {/* Inventory Tab */}
@@ -708,6 +788,14 @@ export default function CloudKitchen() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Snackbar for notifications */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}
+        message={snackbarMessage}
+      />
     </Container>
   );
 } 

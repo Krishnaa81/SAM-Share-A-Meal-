@@ -134,60 +134,156 @@ const Orders = () => {
 
   useEffect(() => {
     const fetchOrders = async () => {
-      if (!user) {
-        setLoading(false);
-        return;
-      }
-
       setLoading(true);
       setError('');
 
+      // Get the localStorage key - use user ID if available, otherwise use 'guest'
+      const storageKey = `user_${user?.id || 'guest'}_orders`;
+      
       try {
-        // Try to get orders from API
-        const config = {
-          headers: {
-            Authorization: `Bearer ${user.token}`
+        // First check if we have saved orders in localStorage for immediate display
+        const savedOrdersJSON = localStorage.getItem(storageKey);
+        let localOrders = [];
+        
+        if (savedOrdersJSON) {
+          try {
+            localOrders = JSON.parse(savedOrdersJSON);
+            // Ensure it's an array
+            if (!Array.isArray(localOrders)) {
+              localOrders = [];
+            }
+            // Show local orders immediately
+            setOrders(localOrders);
+            setTotalPages(Math.ceil(localOrders.length / ordersPerPage));
+          } catch (e) {
+            console.error('Error parsing saved orders:', e);
           }
-        };
-
-        const response = await axios.get('/api/orders', config);
-        const fetchedOrders = response.data;
-        
-        // Save orders to localStorage for persistence
-        localStorage.setItem(`user_${user.id}_orders`, JSON.stringify(fetchedOrders));
-        
-        setOrders(fetchedOrders);
-        setTotalPages(Math.ceil(fetchedOrders.length / ordersPerPage));
-        setLoading(false);
-      } catch (error) {
-        console.error('API fetch error:', error);
-        
-        // Try to load from localStorage as fallback
-        const savedOrders = localStorage.getItem(`user_${user.id}_orders`);
-        
-        if (savedOrders) {
-          const parsedOrders = JSON.parse(savedOrders);
-          setOrders(parsedOrders);
-          setTotalPages(Math.ceil(parsedOrders.length / ordersPerPage));
-          setSnackbarMessage('Showing saved orders. Connection to server failed.');
-          setSnackbarOpen(true);
-        } else {
-          // Use mock data as final fallback
-          setOrders(MOCK_ORDERS);
-          setTotalPages(Math.ceil(MOCK_ORDERS.length / ordersPerPage));
-          setSnackbarMessage('Showing sample orders. Connection to server failed.');
-          setSnackbarOpen(true);
         }
+
+        // If user is logged in, attempt to fetch from API as well
+        if (user && user.token) {
+          try {
+            const config = {
+              headers: {
+                Authorization: `Bearer ${user.token}`
+              }
+            };
+  
+            const response = await axios.get('/api/orders', config);
+            const fetchedOrders = response.data;
+            
+            // Merge with local orders to ensure we don't lose offline orders
+            // This is a simple approach - a more robust solution would need deduplication
+            const allOrders = [...fetchedOrders, ...localOrders.filter(lo => 
+              !fetchedOrders.some(fo => fo._id === lo._id)
+            )];
+            
+            // Save all orders to localStorage
+            localStorage.setItem(storageKey, JSON.stringify(allOrders));
+            
+            setOrders(allOrders);
+            setTotalPages(Math.ceil(allOrders.length / ordersPerPage));
+          } catch (error) {
+            console.error('API fetch error:', error);
+            // Already showing localStorage orders, so just show a notification
+            if (localOrders.length > 0) {
+              setSnackbarMessage('Using locally saved orders. Server connection failed.');
+              setSnackbarOpen(true);
+            } else {
+              // If no local orders and API fails, use mock data
+              setOrders(MOCK_ORDERS);
+              setTotalPages(Math.ceil(MOCK_ORDERS.length / ordersPerPage));
+              setSnackbarMessage('Showing sample orders. Connection to server failed.');
+              setSnackbarOpen(true);
+            }
+          }
+        } else {
+          // If no user token and no local orders, use mock data
+          if (localOrders.length === 0) {
+            setOrders(MOCK_ORDERS);
+            setTotalPages(Math.ceil(MOCK_ORDERS.length / ordersPerPage));
+          }
+        }
+      } catch (error) {
+        console.error('Error loading orders:', error);
+        setError('Failed to load orders. Please try again.');
         
+        // Use mock data as final fallback
+        setOrders(MOCK_ORDERS);
+        setTotalPages(Math.ceil(MOCK_ORDERS.length / ordersPerPage));
+      } finally {
         setLoading(false);
       }
     };
 
     fetchOrders();
-  }, [user]);
+  }, [user, ordersPerPage]);
 
   const handleRefresh = async () => {
-    fetchOrders();
+    setLoading(true);
+    
+    // Get the localStorage key - use user ID if available, otherwise use 'guest'
+    const storageKey = `user_${user?.id || 'guest'}_orders`;
+    
+    try {
+      // First check localStorage
+      const savedOrdersJSON = localStorage.getItem(storageKey);
+      let localOrders = [];
+      
+      if (savedOrdersJSON) {
+        try {
+          localOrders = JSON.parse(savedOrdersJSON);
+          if (!Array.isArray(localOrders)) {
+            localOrders = [];
+          }
+          // Show local orders immediately
+          setOrders(localOrders);
+          setTotalPages(Math.ceil(localOrders.length / ordersPerPage));
+        } catch (e) {
+          console.error('Error parsing saved orders:', e);
+        }
+      }
+      
+      // Try to fetch from API if user is logged in
+      if (user && user.token) {
+        try {
+          const config = {
+            headers: {
+              Authorization: `Bearer ${user.token}`
+            }
+          };
+
+          const response = await axios.get('/api/orders', config);
+          const fetchedOrders = response.data;
+          
+          // Merge with local orders
+          const allOrders = [...fetchedOrders, ...localOrders.filter(lo => 
+            !fetchedOrders.some(fo => fo._id === lo._id)
+          )];
+          
+          // Update localStorage and state
+          localStorage.setItem(storageKey, JSON.stringify(allOrders));
+          setOrders(allOrders);
+          setTotalPages(Math.ceil(allOrders.length / ordersPerPage));
+          setSnackbarMessage('Orders refreshed successfully');
+          setSnackbarOpen(true);
+        } catch (error) {
+          console.error('Error fetching from API:', error);
+          if (localOrders.length > 0) {
+            setSnackbarMessage('Using locally saved orders. Server connection failed.');
+          } else {
+            setSnackbarMessage('Failed to refresh orders. No saved orders found.');
+          }
+          setSnackbarOpen(true);
+        }
+      }
+    } catch (error) {
+      console.error('Error refreshing orders:', error);
+      setSnackbarMessage('Failed to refresh orders.');
+      setSnackbarOpen(true);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handlePageChange = (event, value) => {

@@ -41,13 +41,14 @@ import {
   Favorite,
   FavoriteBorder,
 } from '@mui/icons-material';
+import ImageWithFallback from '../components/ImageWithFallback';
 
 // Mock restaurant data
 const MOCK_RESTAURANTS = [
   {
     id: 1,
     name: 'Spice Garden',
-    image: '/images/restaurants/spice-garden.jpg',
+    image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8cmVzdGF1cmFudHxlbnwwfHwwfHw%3D&w=1000&q=80',
     cuisine: 'Indian',
     rating: 4.8,
     priceLevel: '₹₹',
@@ -60,7 +61,7 @@ const MOCK_RESTAURANTS = [
   {
     id: 2,
     name: 'Pasta Paradise',
-    image: '/images/restaurants/pasta-paradise.jpg',
+    image: 'https://images.unsplash.com/photo-1579684947550-22e945225d9a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MjB8fGl0YWxpYW4lMjByZXN0YXVyYW50fGVufDB8fDB8fA%3D%3D&w=1000&q=80',
     cuisine: 'Italian',
     rating: 4.5,
     priceLevel: '₹₹₹',
@@ -73,7 +74,7 @@ const MOCK_RESTAURANTS = [
   {
     id: 3,
     name: 'Sushi Sake',
-    image: '/images/restaurants/sushi-sake.jpg',
+    image: 'https://images.unsplash.com/photo-1611143669185-af224c5e3252?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8c3VzaGklMjByZXN0YXVyYW50fGVufDB8fDB8fA%3D%3D&w=1000&q=80',
     cuisine: 'Japanese',
     rating: 4.7,
     priceLevel: '₹₹₹',
@@ -86,7 +87,7 @@ const MOCK_RESTAURANTS = [
   {
     id: 4,
     name: 'Burger Barn',
-    image: '/images/restaurants/burger-barn.jpg',
+    image: 'https://images.unsplash.com/photo-1585238342024-78d387f4a707?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8YnVyZ2VyJTIwcmVzdGF1cmFudHxlbnwwfHwwfHw%3D&w=1000&q=80',
     cuisine: 'American',
     rating: 4.4,
     priceLevel: '₹',
@@ -99,7 +100,7 @@ const MOCK_RESTAURANTS = [
   {
     id: 5,
     name: 'Thai Delight',
-    image: '/images/restaurants/thai-delight.jpg',
+    image: 'https://images.unsplash.com/photo-1552566626-52f8b828add9?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8dGhhaSUyMGZvb2R8ZW58MHx8MHx8&w=1000&q=80',
     cuisine: 'Thai',
     rating: 4.6,
     priceLevel: '₹₹',
@@ -112,7 +113,7 @@ const MOCK_RESTAURANTS = [
   {
     id: 6,
     name: 'Mexico Lindo',
-    image: '/images/restaurants/mexico-lindo.jpg',
+    image: 'https://images.unsplash.com/photo-1593058629791-a9acea84f0ee?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NHx8bWV4aWNhbiUyMHJlc3RhdXJhbnR8ZW58MHx8MHx8&w=1000&q=80',
     cuisine: 'Mexican',
     rating: 4.3,
     priceLevel: '₹₹',
@@ -125,7 +126,7 @@ const MOCK_RESTAURANTS = [
   {
     id: 7,
     name: 'Pizza Place',
-    image: '/images/restaurants/pizza-place.jpg',
+    image: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8cGl6emF8ZW58MHx8MHx8&w=1000&q=80',
     cuisine: 'Italian',
     rating: 4.1,
     priceLevel: '₹',
@@ -138,7 +139,7 @@ const MOCK_RESTAURANTS = [
   {
     id: 8,
     name: 'Golden Dragon',
-    image: '/images/restaurants/golden-dragon.jpg',
+    image: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NHx8Y2hpbmVzZSUyMHJlc3RhdXJhbnR8ZW58MHx8MHx8&w=1000&q=80',
     cuisine: 'Chinese',
     rating: 4.4,
     priceLevel: '₹₹',
@@ -171,11 +172,12 @@ const RestaurantCard = ({ restaurant, favorite = false, onToggleFavorite }) => {
       }}
     >
       <Box sx={{ position: 'relative' }}>
-        <CardMedia
-          component="img"
-          height="180"
-          image={restaurant.image}
+        <ImageWithFallback
+          src={restaurant.image}
           alt={restaurant.name}
+          category="restaurant"
+          style={{ height: '180px', width: '100%', objectFit: 'cover' }}
+          className="restaurant-image"
         />
         <IconButton 
           sx={{ 
