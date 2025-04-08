@@ -12,8 +12,10 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:3000'], // Support both common frontend ports
-  credentials: true, // Allow cookies to be sent with requests
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['https://sam-share-a-meal.vercel.app', 'https://sam-share-a-meal-git-main-tirumalareddysai.vercel.app']
+    : ['http://localhost:5173', 'http://localhost:3000'],
+  credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
@@ -128,4 +130,4 @@ const PORT = process.env.PORT || 5000;
 // Start server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-}); 
+});
