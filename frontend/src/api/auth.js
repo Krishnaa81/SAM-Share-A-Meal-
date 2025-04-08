@@ -1,7 +1,6 @@
 import axios from 'axios';
-import { config } from '../config/env';
 
-const API_URL = `${config.API_URL}/auth`;
+const API_URL = 'http://localhost:5000/api/auth';
 
 // Create axios instance with default config
 const api = axios.create({
@@ -145,4 +144,4 @@ export const getCurrentUser = () => {
     }
   }
   return null;
-};
+}; 
